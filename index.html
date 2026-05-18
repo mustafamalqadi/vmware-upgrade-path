@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
 :root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-card:#1c2128;--bg-card-hover:#262c34;--accent:#58a6ff;--accent-light:#79c0ff;--success:#3fb950;--success-light:#56d364;--danger:#f85149;--danger-light:#ff7b72;--warning:#d29922;--warning-light:#e3b341;--purple:#a78bfa;--purple-light:#c4b5fd;--orange:#f97316;--orange-light:#fb923c;--text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#6e7681;--border:#30363d}
-[data-theme="light"]{--bg-primary:#ffffff;--bg-secondary:#f6f8fa;--bg-card:#ffffff;--bg-card-hover:#f3f4f6;--text-primary:#1f2937;--text-secondary:#4b5563;--text-muted:#6b7280;--border:#d1d5db}
+[data-theme="light"]{--bg-primary:#ffffff;--bg-secondary:#f6f8fa;--bg-card:#ffffff;--bg-card-hover:#f3f4f6;--text-primary:#1f2937;--text-secondary:#4b5563;--text-muted:#6b7280;--border:#d1d5db;--accent:#2563eb;--accent-light:#3b82f6;--success:#16a34a;--success-light:#22c55e;--danger:#dc2626;--danger-light:#ef4444;--warning:#ca8a04;--warning-light:#eab308;--purple:#7c3aed;--purple-light:#8b5cf6;--orange:#ea580c;--orange-light:#f97316}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7;min-height:100vh}
@@ -24,7 +24,14 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 
 /* Header */
 .header{background:rgba(13,17,23,.85);border-bottom:1px solid var(--border);padding:1.25rem 2rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-[data-theme="light"] .header{background:rgba(255,255,255,.85)}
+[data-theme="light"] .header{background:rgba(255,255,255,.9)}
+[data-theme="light"] .product-card:hover{border-color:rgba(37,99,235,.25)}
+[data-theme="light"] .product-card.active{box-shadow:0 0 24px rgba(37,99,235,.08)}
+[data-theme="light"] .toast{background:#fff;border-color:var(--border);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+[data-theme="light"] .saved-plans-panel{box-shadow:0 8px 32px rgba(0,0,0,.12)}
+[data-theme="light"] .dep-tooltip .dep-tip{background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+[data-theme="light"] .header-logo{box-shadow:0 2px 8px rgba(37,99,235,.2)}
+[data-theme="light"] .scroll-progress{background:linear-gradient(90deg,#2563eb,#16a34a,#7c3aed)}
 .header-inner{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 .header-brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:inherit}
 .header-logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--success));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.7rem;color:#fff}
@@ -161,7 +168,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 .timeline-row{display:flex;align-items:center;gap:.75rem}
 .timeline-label{width:100px;font-size:.75rem;font-weight:600;color:var(--text-secondary);text-align:right;flex-shrink:0}
 .timeline-track{flex:1;height:32px;background:var(--bg-secondary);border-radius:6px;position:relative;overflow:hidden}
-.timeline-fill{position:absolute;top:4px;bottom:4px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff;white-space:nowrap;padding:0 .5rem;transition:width .5s ease}
+.timeline-fill{position:absolute;top:4px;bottom:4px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff;white-space:nowrap;padding:0 .5rem;transition:width .5s ease;min-width:60px;overflow:hidden;text-overflow:ellipsis}
 .timeline-legend{display:flex;gap:1.5rem;margin-top:1rem;font-size:.7rem;color:var(--text-muted);flex-wrap:wrap}
 .timeline-legend-item{display:flex;align-items:center;gap:.3rem}
 .timeline-legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
@@ -239,6 +246,25 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 /* Keyboard hints */
 .kbd{display:inline-block;padding:.1rem .35rem;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border);font-size:.6rem;font-weight:700;color:var(--text-muted);font-family:'Inter',monospace;vertical-align:middle;margin-left:.35rem;line-height:1.3}
 
+/* Expand/collapse all */
+.expand-all-row{display:flex;justify-content:flex-end;margin-bottom:.75rem}
+.expand-all-btn{background:none;border:1px solid var(--border);color:var(--text-secondary);font-size:.72rem;font-weight:600;padding:.3rem .75rem;border-radius:6px;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:.3rem}
+.expand-all-btn:hover{color:var(--accent-light);border-color:rgba(88,166,255,.25);background:rgba(88,166,255,.04)}
+
+/* Version direction warning */
+.dir-warning{font-size:.68rem;color:var(--warning-light);margin-top:.2rem;display:none}
+.dir-warning.visible{display:block}
+
+/* Mobile hamburger */
+.mobile-menu-toggle{display:none;background:none;border:1px solid var(--border);border-radius:6px;padding:.35rem .5rem;cursor:pointer;color:var(--text-secondary);font-size:.8rem;line-height:1}
+.mobile-menu-toggle:hover{color:var(--accent-light);border-color:rgba(88,166,255,.3)}
+@media(max-width:700px){
+    .mobile-menu-toggle{display:flex;align-items:center;justify-content:center}
+    .header-links{display:none;flex-direction:column;width:100%;gap:.5rem;padding-top:.5rem;border-top:1px solid var(--border);margin-top:.5rem}
+    .header-links.open{display:flex}
+    .header-links a{padding:.3rem 0}
+}
+
 /* Footer */
 .footer{border-top:1px solid var(--border);margin-top:4rem;padding:2rem;text-align:center;color:var(--text-muted);font-size:.75rem}
 .footer a{color:var(--text-secondary);text-decoration:none;transition:color .15s}
@@ -284,7 +310,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
             <span class="header-badge">5 Products</span>
             <span class="header-badge" style="background:rgba(63,185,80,.08);color:var(--success-light);border-color:rgba(63,185,80,.2)">88+ Versions</span>
             <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">&#127769;</button>
-            <div class="header-links">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="document.getElementById('headerLinks').classList.toggle('open')" title="Menu">&#9776;</button>
+            <div class="header-links" id="headerLinks">
                 <a href="https://mustafamalqadi.github.io/vmware-kbs/">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                     KB Portal
@@ -340,7 +367,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
         </button>
         <button class="btn" id="btnSavedPlans" onclick="toggleSavedPlans()" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
-            Saved Plans
+            Saved Plans <span class="sp-count"></span>
         </button>
         <div class="saved-plans-panel" id="savedPlansPanel"></div>
     </div>
@@ -518,6 +545,7 @@ function buildSelectors(){
             '<div class="version-row"><label>To</label><select id="to-'+key+'" onchange="onVersionChange(\''+key+'\')"><option value="">\u2014 Skip \u2014</option>'+versionsHtml+'</select></div>'+
             '<div class="version-info" id="info-'+key+'"></div>'+
             '<div class="eol-warning" id="eol-'+key+'">&#9888; This version is end-of-life</div>'+
+            '<div class="dir-warning" id="dir-'+key+'">&#9888; Target version appears older than source — are you sure?</div>'+
             (key==='vcf'?'<button class="bom-autofill" id="bomAutofill" onclick="applyBOM()">&#9881; Auto-fill BOM versions</button>':'');
         c.appendChild(card);
     });
@@ -530,6 +558,7 @@ window.onVersionChange=function(key){
     var card=document.getElementById('card-'+key);
     var info=document.getElementById('info-'+key);
     var eolEl=document.getElementById('eol-'+key);
+    var dirEl=document.getElementById('dir-'+key);
 
     if(from&&to&&from!==to){
         card.classList.add('active');
@@ -547,10 +576,20 @@ window.onVersionChange=function(key){
         } else {
             eolEl.classList.remove('visible');
         }
+
+        // Direction warning — check if "To" index is before "From" in the versions array
+        var fromIdx=prod.versions.indexOf(fv);
+        var toIdx=prod.versions.indexOf(tv);
+        if(fromIdx>=0&&toIdx>=0&&toIdx<fromIdx){
+            dirEl.classList.add('visible');
+        } else {
+            dirEl.classList.remove('visible');
+        }
     } else {
         card.classList.remove('active');
         info.textContent='';
         eolEl.classList.remove('visible');
+        dirEl.classList.remove('visible');
     }
 
     // VCF BOM auto-fill button visibility
@@ -818,6 +857,7 @@ function updateSavedPlansButton(){
     var btn=document.getElementById('btnSavedPlans');
     if(plans.length>0){
         btn.style.display='';
+        btn.querySelector('.sp-count').textContent='('+plans.length+')';
     } else {
         btn.style.display='none';
         document.getElementById('savedPlansPanel').classList.remove('visible');
@@ -903,6 +943,7 @@ window.generatePlan=function(){
         '<span class="badge badge-warning">'+totalHops+' Version Hop'+(totalHops>1?'s':'')+'</span>'+
         '<span class="badge badge-success">'+(warnings.length===0?'No Warnings':warnings.length+' Warning'+(warnings.length>1?'s':''))+'</span>'+
     '</div></div>';
+    html+='<div class="expand-all-row"><button class="expand-all-btn" onclick="toggleAllDetails(this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg> Expand All</button></div>';
 
     var stepNum=0;
     stepPlans.forEach(function(plan){
@@ -1056,6 +1097,22 @@ window.toggleDetail=function(id,btn){
     btn.classList.toggle('open');
 };
 
+window.toggleAllDetails=function(btn){
+    var contents=document.querySelectorAll('.detail-content');
+    var toggles=document.querySelectorAll('.detail-toggle');
+    var allOpen=true;
+    contents.forEach(function(c){if(!c.classList.contains('open')) allOpen=false;});
+    if(allOpen){
+        contents.forEach(function(c){c.classList.remove('open');});
+        toggles.forEach(function(t){t.classList.remove('open');});
+        btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg> Expand All';
+    } else {
+        contents.forEach(function(c){c.classList.add('open');});
+        toggles.forEach(function(t){t.classList.add('open');});
+        btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg> Collapse All';
+    }
+};
+
 window.resetAll=function(){
     UPGRADE_ORDER.forEach(function(key){
         document.getElementById('from-'+key).value='';
@@ -1063,6 +1120,7 @@ window.resetAll=function(){
         document.getElementById('card-'+key).classList.remove('active');
         document.getElementById('info-'+key).textContent='';
         document.getElementById('eol-'+key).classList.remove('visible');
+        document.getElementById('dir-'+key).classList.remove('visible');
     });
     var bomBtn=document.getElementById('bomAutofill');
     if(bomBtn) bomBtn.classList.remove('visible');
@@ -1085,6 +1143,8 @@ window.exportPDF=function(){
     var interop=document.getElementById('interopPanel').innerHTML;
     var results=document.getElementById('results').innerHTML;
     var timeline=document.getElementById('timelineSection').innerHTML;
+    var maintCalc=document.getElementById('maintCalc');
+    var maintHtml=maintCalc.classList.contains('visible')?document.getElementById('maintResult').innerHTML:'';
     if(!results){alert('Generate a plan first.');return;}
     var win=window.open('','_blank');
     var styles=document.querySelector('style').textContent;
@@ -1102,6 +1162,7 @@ window.exportPDF=function(){
     win.document.write('<div class="export-header"><h1>VMware Upgrade Plan</h1><p>Generated '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})+' \u2014 mustafamalqadi.github.io/vmware-upgrade-path</p></div>');
     if(interop) win.document.write('<div class="interop-panel visible">'+interop+'</div>');
     win.document.write('<div class="results visible">'+results+'</div>');
+    if(maintHtml) win.document.write('<div style="margin:1rem 0;padding:.75rem 1rem;border:1px solid #ddd;border-radius:8px;background:#f0fdf4;font-size:.85rem;font-weight:600;color:#166534">'+maintHtml+'</div>');
     if(timeline) win.document.write('<div class="timeline-section visible">'+timeline+'</div>');
     win.document.write('</body></html>');
     win.document.close();
