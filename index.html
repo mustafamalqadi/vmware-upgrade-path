@@ -422,6 +422,34 @@ button,select,input{font-family:inherit}
 .docs-links a{font-size:.7rem;padding:.2rem .6rem;border-radius:5px;background:rgba(88,166,255,.08);color:var(--accent-light);border:1px solid rgba(88,166,255,.15);text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:.25rem}
 .docs-links a:hover{background:rgba(88,166,255,.15);border-color:rgba(88,166,255,.3)}
 
+/* CLI Commands */
+.cli-commands{margin:.5rem 0;font-size:.78rem}
+.cli-commands h5{font-size:.78rem;font-weight:700;margin:.75rem 0 .4rem;color:var(--text-primary)}
+.cli-cmd-item{margin-bottom:.6rem;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:rgba(0,0,0,.15)}
+.cli-cmd-header{display:flex;justify-content:space-between;align-items:center;padding:.4rem .7rem;background:rgba(88,166,255,.06);border-bottom:1px solid var(--border)}
+.cli-cmd-header span{font-weight:600;font-size:.72rem;color:var(--text-secondary)}
+.cli-copy-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:.25rem .4rem;cursor:pointer;color:var(--text-muted);transition:all .15s;display:flex;align-items:center}
+.cli-copy-btn:hover{color:var(--accent-light);border-color:var(--accent);background:rgba(88,166,255,.08)}
+.cli-cmd-item pre{margin:0;padding:.6rem .8rem;font-size:.72rem;font-family:'JetBrains Mono',Consolas,monospace;line-height:1.5;color:var(--text-secondary);overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+[data-theme="light"] .cli-cmd-item{background:rgba(0,0,0,.03)}
+
+/* Progress Tracker */
+.progress-tracker{max-width:840px;margin:0 auto 1.5rem;padding:1.75rem 2rem;border-radius:var(--radius-lg);border:1px solid var(--border);background:var(--bg-card);display:none;box-shadow:var(--shadow-sm)}
+.progress-tracker.visible{display:block;animation:fadeIn .3s ease}
+.progress-tracker h4{font-size:1rem;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.progress-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;font-size:.8rem;color:var(--text-muted)}
+.progress-elapsed{font-weight:600}
+.progress-count{font-weight:600;color:var(--accent-light)}
+.progress-steps{margin-top:.75rem}
+.progress-step{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;margin-bottom:.35rem;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.02);cursor:pointer;transition:all .15s;font-size:.78rem;border-left:3px solid var(--border)}
+.progress-step:hover{background:rgba(88,166,255,.04);border-color:rgba(88,166,255,.2)}
+.progress-step.done{opacity:.6;background:rgba(63,185,80,.04);border-color:rgba(63,185,80,.2)}
+.progress-step.done .ps-label{text-decoration:line-through}
+.progress-step input[type="checkbox"]{accent-color:var(--success);cursor:pointer;width:15px;height:15px}
+.ps-label{flex:1;font-weight:500;color:var(--text-primary)}
+.ps-time{font-size:.68rem;color:var(--success);font-weight:600}
+.progress-complete{margin-top:1rem;padding:.75rem 1rem;border-radius:8px;background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.3);color:var(--success);font-weight:700;font-size:.85rem;text-align:center}
+
 @media print{
     .header,.action-bar,.scroll-progress,.footer,.hero,.stack-selector,.toast,.saved-plans-panel,.preflight-panel{display:none!important}
     .results,.timeline-section,.interop-panel,.stack-order{break-inside:avoid}
@@ -509,6 +537,14 @@ button,select,input{font-family:inherit}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
             Saved Plans <span class="sp-count"></span>
         </button>
+        <button class="btn" id="btnCAB" onclick="exportCAB()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            CAB Export
+        </button>
+        <button class="btn" id="btnTracker" onclick="startProgressTracker()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Start Tracker
+        </button>
         <div class="saved-plans-panel" id="savedPlansPanel"></div>
     </div>
 
@@ -517,6 +553,7 @@ button,select,input{font-family:inherit}
     <div class="upgrade-sequence" id="upgradeSequence"></div>
     <div class="eol-timeline" id="eolTimeline"></div>
     <div class="preflight-panel" id="preflightPanel"></div>
+    <div class="progress-tracker" id="progressTracker"></div>
     <div class="maint-calc" id="maintCalc">
         <h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Maintenance Window Calculator</h4>
         <div class="maint-calc-grid">
@@ -1807,6 +1844,34 @@ window.generatePlan=function(){
             html+='</ul></div></div>';
         }
 
+        // PowerCLI/CLI Commands
+        var cliData=CLI_COMMANDS[plan.key];
+        if(cliData){
+            var cliId='cli-'+plan.key;
+            var cliTotal=(cliData.preUpgrade?cliData.preUpgrade.length:0)+(cliData.upgrade?cliData.upgrade.length:0)+(cliData.postUpgrade?cliData.postUpgrade.length:0);
+            html+='<button class="detail-toggle" onclick="toggleDetail(\''+cliId+'\',this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>CLI/PowerCLI Commands ('+cliTotal+')</button>';
+            html+='<div class="detail-content" id="'+cliId+'"><div class="cli-commands">';
+            if(cliData.preUpgrade&&cliData.preUpgrade.length){
+                html+='<h5>&#128295; Pre-Upgrade Commands</h5>';
+                cliData.preUpgrade.forEach(function(c){
+                    html+='<div class="cli-cmd-item"><div class="cli-cmd-header"><span>'+c.label+'</span><button class="cli-copy-btn" onclick="copyCLI(this)" title="Copy command"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div><pre>'+c.cmd+'</pre></div>';
+                });
+            }
+            if(cliData.upgrade&&cliData.upgrade.length){
+                html+='<h5>&#9889; Upgrade Commands</h5>';
+                cliData.upgrade.forEach(function(c){
+                    html+='<div class="cli-cmd-item"><div class="cli-cmd-header"><span>'+c.label+'</span><button class="cli-copy-btn" onclick="copyCLI(this)" title="Copy command"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div><pre>'+c.cmd+'</pre></div>';
+                });
+            }
+            if(cliData.postUpgrade&&cliData.postUpgrade.length){
+                html+='<h5>&#9989; Post-Upgrade Commands</h5>';
+                cliData.postUpgrade.forEach(function(c){
+                    html+='<div class="cli-cmd-item"><div class="cli-cmd-header"><span>'+c.label+'</span><button class="cli-copy-btn" onclick="copyCLI(this)" title="Copy command"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div><pre>'+c.cmd+'</pre></div>';
+                });
+            }
+            html+='</div></div>';
+        }
+
         html+='</div></div>';
     });
 
@@ -1835,6 +1900,11 @@ window.generatePlan=function(){
     document.getElementById('btnExport').style.display='';
     document.getElementById('btnCopyLink').style.display='';
     document.getElementById('btnSavePlan').style.display='';
+    document.getElementById('btnCAB').style.display='';
+    document.getElementById('btnTracker').style.display='';
+
+    // Show progress tracker if state exists
+    renderProgressTracker();
 
     // Show maintenance calculator if ESXi is selected
     var maintCalc=document.getElementById('maintCalc');
@@ -1913,6 +1983,320 @@ window.copyTemplate=function(idx){
     }
 };
 
+// ---- PowerCLI/CLI Command Generator ----
+var CLI_COMMANDS={
+    vcenter:{
+        preUpgrade:[
+            {label:'Backup vCenter (VAMI)',cmd:'# SSH to VCSA as root\ncurl -sk -X POST https://localhost:5480/rest/appliance/recovery/backup/job \\\n  -H "Content-Type: application/json" \\\n  -d \'{"piece":{"location_type":"SFTP","location":"sftp://backup-server/vcsa-backups","location_user":"backup","location_password":"***"}}\''},
+            {label:'Take VM Snapshot (PowerCLI)',cmd:'# PowerCLI - Connect first: Connect-VIServer -Server <vcsa-fqdn>\n$vm = Get-VM -Name "vcsa-appliance"\nNew-Snapshot -VM $vm -Name "pre-upgrade-$(Get-Date -Format yyyyMMdd)" `\n  -Description "Pre-upgrade snapshot" -Memory -Quiesce'},
+            {label:'Verify Services',cmd:'# SSH to VCSA\nservice-control --status --all'},
+            {label:'Check Disk Space',cmd:'# SSH to VCSA\ndf -h / /storage /var/log /storage/db'},
+            {label:'DNS Verification',cmd:'# SSH to VCSA\nnslookup $(hostname -f)\nnslookup $(hostname -i)'}
+        ],
+        upgrade:[
+            {label:'CLI Upgrade (JSON Template)',cmd:'# From admin workstation with ISO mounted\nvcsa-deploy upgrade --accept-eula \\\n  --acknowledge-ceip \\\n  --no-ssl-certificate-verification \\\n  /path/to/upgrade-template.json'},
+            {label:'VAMI Patch (minor update)',cmd:'# SSH to VCSA as root\nsoftware-packages stage --iso --acceptEulas\nsoftware-packages list --staged\nsoftware-packages install --staged'}
+        ],
+        postUpgrade:[
+            {label:'Verify Build',cmd:'# SSH to VCSA\nrpm -qa | grep vpxd\ncat /etc/applmgmt/appliance/update.conf'},
+            {label:'Check All Services',cmd:'# SSH to VCSA\nservice-control --status --all'},
+            {label:'Test vMotion (PowerCLI)',cmd:'# PowerCLI\n$vm = Get-VM -Name "test-vm"\n$target = Get-VMHost -Name "esxi-host-2"\nMove-VM -VM $vm -Destination $target -Confirm:$false'}
+        ]
+    },
+    esxi:{
+        preUpgrade:[
+            {label:'Enter Maintenance Mode',cmd:'# PowerCLI\nGet-VMHost -Name "<hostname>" | Set-VMHost -State Maintenance -Evacuate'},
+            {label:'Backup Host Config',cmd:'# SSH to ESXi\nvim-cmd hostsvc/firmware/backup_config\n# Download the resulting bundle URL'},
+            {label:'Check VIBs',cmd:'# SSH to ESXi\nesxcli software vib list | grep -i "<vendor>"'}
+        ],
+        upgrade:[
+            {label:'esxcli Upgrade (depot)',cmd:'# SSH to ESXi (in maintenance mode)\nesxcli software profile update \\\n  -p ESXi-8.0U3c-25012014-standard \\\n  -d https://hostupdate.vmware.com/software/VUM/PRODUCTION/main/vmw-depot-index.xml'},
+            {label:'esxcli Upgrade (offline ZIP)',cmd:'# SSH to ESXi\nesxcli software profile update \\\n  -p ESXi-8.0U3c-25012014-standard \\\n  -d /vmfs/volumes/datastore1/VMware-ESXi-8.0U3c-25012014-depot.zip'},
+            {label:'vLCM Remediate (PowerCLI)',cmd:'# PowerCLI - remediate host via vLCM\n$cluster = Get-Cluster -Name "Production"\n$vmhost = Get-VMHost -Name "<hostname>"\nTest-Compliance -Entity $vmhost\nRemediate-Inventory -Entity $vmhost -Confirm:$false'}
+        ],
+        postUpgrade:[
+            {label:'Exit Maintenance Mode',cmd:'# PowerCLI\nGet-VMHost -Name "<hostname>" | Set-VMHost -State Connected'},
+            {label:'Verify Version',cmd:'# SSH to ESXi\nvmware -v\nesxcli system version get'},
+            {label:'Check Boot Bank',cmd:'# SSH to ESXi\nesxcli system boot device get\n/sbin/bootOption -a  # Shows alt boot bank version'}
+        ]
+    },
+    nsx:{
+        preUpgrade:[
+            {label:'NSX Manager Backup',cmd:'# NSX API - Trigger backup\ncurl -sk -u admin:\'<password>\' -X POST \\\n  https://<nsx-mgr>/api/v1/cluster/backups?action=backup_to_remote'},
+            {label:'Check Cluster Status',cmd:'# NSX API\ncurl -sk -u admin:\'<password>\' \\\n  https://<nsx-mgr>/api/v1/cluster/status | python -m json.tool'},
+            {label:'Verify Transport Nodes',cmd:'# NSX API\ncurl -sk -u admin:\'<password>\' \\\n  https://<nsx-mgr>/api/v1/transport-nodes/state | python -m json.tool'}
+        ],
+        upgrade:[
+            {label:'Upload Upgrade Bundle',cmd:'# NSX API\ncurl -sk -u admin:\'<password>\' -X POST \\\n  https://<nsx-mgr>/api/v1/upgrade/bundles \\\n  -F "file=@/path/to/VMware-NSX-upgrade-bundle-4.2.1.0.mub"'},
+            {label:'Run Pre-checks',cmd:'# NSX API\ncurl -sk -u admin:\'<password>\' -X POST \\\n  https://<nsx-mgr>/api/v1/upgrade?action=execute_pre_upgrade_checks'},
+            {label:'Start Upgrade',cmd:'# NSX UI: System > Upgrade > Start\n# Or API:\ncurl -sk -u admin:\'<password>\' -X POST \\\n  https://<nsx-mgr>/api/v1/upgrade/plan?action=start'}
+        ],
+        postUpgrade:[
+            {label:'Verify Version',cmd:'# NSX API\ncurl -sk -u admin:\'<password>\' \\\n  https://<nsx-mgr>/api/v1/node/version'},
+            {label:'Check Edge Status',cmd:'# NSX API\ncurl -sk -u admin:\'<password>\' \\\n  https://<nsx-mgr>/api/v1/edge-clusters/status'}
+        ]
+    },
+    vsan:{
+        preUpgrade:[
+            {label:'Check vSAN Health',cmd:'# PowerCLI\nGet-VsanClusterConfiguration -Cluster "Production" | Format-List\nTest-VsanClusterHealth -Cluster "Production"'},
+            {label:'Check Resync Status',cmd:'# PowerCLI\nGet-VsanResyncingComponent -Cluster "Production"'},
+            {label:'Document Storage Policies',cmd:'# PowerCLI\nGet-SpbmStoragePolicy | Select Name, Description | Format-Table -Auto\nGet-SpbmEntityConfiguration -VM (Get-VM) | Select Entity, StoragePolicy'}
+        ],
+        upgrade:[
+            {label:'Upgrade ODF (per-host)',cmd:'# vSAN ODF is upgraded automatically when ESXi is upgraded\n# Verify post-ESXi-upgrade:\n# PowerCLI\n(Get-VsanClusterConfiguration -Cluster "Production").VsanDiskFormatVersion'},
+            {label:'Upgrade Disk Format',cmd:'# PowerCLI\n$cluster = Get-Cluster "Production"\nUpdate-VsanDiskGroup -Cluster $cluster -ObjectFormat\n# Note: This is IRREVERSIBLE'}
+        ],
+        postUpgrade:[
+            {label:'Health Check',cmd:'# PowerCLI\nTest-VsanClusterHealth -Cluster "Production" -FetchFromCache:$false'},
+            {label:'Verify ODF Version',cmd:'# PowerCLI\n(Get-VsanClusterConfiguration -Cluster "Production").VsanDiskFormatVersion\n# Expected: 19 (for vSAN 8.0 U3)'}
+        ]
+    },
+    vcf:{
+        preUpgrade:[
+            {label:'SDDC Manager Health',cmd:'# SDDC Manager API\ncurl -sk -H "Authorization: Bearer <token>" \\\n  https://<sddc-mgr>/v1/system/prechecks | python -m json.tool'},
+            {label:'Download Bundle',cmd:'# SDDC Manager UI: Lifecycle Management > Bundle Management\n# Or API:\ncurl -sk -H "Authorization: Bearer <token>" -X POST \\\n  https://<sddc-mgr>/v1/bundles -d \'{"bundleType":"UPGRADE"}\''},
+            {label:'Validate Inventory',cmd:'# SDDC Manager API\ncurl -sk -H "Authorization: Bearer <token>" \\\n  https://<sddc-mgr>/v1/system/validate | python -m json.tool'}
+        ],
+        upgrade:[
+            {label:'Start VCF Upgrade',cmd:'# SDDC Manager UI: Lifecycle Management > Updates > Review/Schedule\n# Or API:\ncurl -sk -H "Authorization: Bearer <token>" -X PATCH \\\n  https://<sddc-mgr>/v1/upgrades/<upgrade-id> \\\n  -d \'{"upgradeStatus":"SCHEDULED"}\''},
+            {label:'Monitor Progress',cmd:'# SDDC Manager API\ncurl -sk -H "Authorization: Bearer <token>" \\\n  https://<sddc-mgr>/v1/upgrades/<upgrade-id>/status'}
+        ],
+        postUpgrade:[
+            {label:'Verify VCF Version',cmd:'# SDDC Manager API\ncurl -sk -H "Authorization: Bearer <token>" \\\n  https://<sddc-mgr>/v1/system | python -m json.tool | grep version'},
+            {label:'Validate All Domains',cmd:'# SDDC Manager API\ncurl -sk -H "Authorization: Bearer <token>" \\\n  https://<sddc-mgr>/v1/domains | python -m json.tool'}
+        ]
+    }
+};
+
+window.copyCLI=function(el){
+    var pre=el.closest('.cli-cmd-item').querySelector('pre');
+    var text=pre.textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){showToast('Command copied!');});
+    } else {
+        var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';
+        document.body.appendChild(ta);ta.select();
+        try{document.execCommand('copy');showToast('Copied!');}catch(e){}
+        document.body.removeChild(ta);
+    }
+};
+
+// ---- Upgrade Progress Tracker ----
+var PROGRESS_STORAGE='vmware-upgrade-progress';
+
+function getProgressState(){
+    try{var s=localStorage.getItem(PROGRESS_STORAGE);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function saveProgressState(state){
+    try{localStorage.setItem(PROGRESS_STORAGE,JSON.stringify(state));}catch(e){}
+}
+
+window.startProgressTracker=function(){
+    if(!lastPlan) return;
+    var state={startTime:Date.now(),steps:[],completed:false};
+    lastPlan.forEach(function(plan){
+        if(plan.error) return;
+        var prod=PRODUCT_MAP[plan.key];
+        for(var i=0;i<plan.path.length-1;i++){
+            state.steps.push({
+                key:plan.key,
+                from:plan.path[i],
+                to:plan.path[i+1],
+                label:PRODUCT_LABELS[plan.key]+': '+getLabel(prod,plan.path[i])+' → '+getLabel(prod,plan.path[i+1]),
+                done:false,
+                doneAt:null
+            });
+        }
+    });
+    saveProgressState(state);
+    renderProgressTracker();
+    showToast('Progress tracker started!');
+};
+
+window.markProgressStep=function(idx){
+    var state=getProgressState();
+    if(!state||idx<0||idx>=state.steps.length) return;
+    state.steps[idx].done=!state.steps[idx].done;
+    state.steps[idx].doneAt=state.steps[idx].done?Date.now():null;
+    // Check if all done
+    state.completed=state.steps.every(function(s){return s.done;});
+    saveProgressState(state);
+    renderProgressTracker();
+};
+
+window.resetProgress=function(){
+    localStorage.removeItem(PROGRESS_STORAGE);
+    var panel=document.getElementById('progressTracker');
+    panel.classList.remove('visible');
+    showToast('Progress tracker reset.');
+};
+
+function renderProgressTracker(){
+    var panel=document.getElementById('progressTracker');
+    var state=getProgressState();
+    if(!state||state.steps.length===0){panel.classList.remove('visible');return;}
+    panel.classList.add('visible');
+
+    var doneCount=state.steps.filter(function(s){return s.done;}).length;
+    var totalCount=state.steps.length;
+    var pct=Math.round((doneCount/totalCount)*100);
+    var elapsed=Date.now()-state.startTime;
+    var hrs=Math.floor(elapsed/3600000);
+    var mins=Math.floor((elapsed%3600000)/60000);
+    var elapsedStr=hrs>0?hrs+'h '+mins+'m':mins+'m';
+
+    var html='<h4>&#128640; Upgrade Progress Tracker</h4>';
+    html+='<div class="progress-meta"><span class="progress-elapsed">&#9201; Elapsed: '+elapsedStr+'</span><span class="progress-count">'+doneCount+'/'+totalCount+' steps</span></div>';
+    html+='<div class="preflight-progress"><div class="preflight-bar"><div class="preflight-fill" style="width:'+pct+'%"></div></div><span class="preflight-pct">'+pct+'%</span></div>';
+    html+='<div class="progress-steps">';
+    state.steps.forEach(function(step,idx){
+        var stepElapsed='';
+        if(step.done&&step.doneAt){
+            var diff=step.doneAt-state.startTime;
+            var sh=Math.floor(diff/3600000);
+            var sm=Math.floor((diff%3600000)/60000);
+            stepElapsed=' (at '+((sh>0)?sh+'h ':'')+sm+'m)';
+        }
+        html+='<label class="progress-step'+(step.done?' done':'')+'" style="border-left-color:'+COLORS[step.key]+'">';
+        html+='<input type="checkbox" '+(step.done?'checked':'')+' onchange="markProgressStep('+idx+')">';
+        html+='<span class="ps-label">'+step.label+'</span>';
+        if(step.done) html+='<span class="ps-time">✓'+stepElapsed+'</span>';
+        html+='</label>';
+    });
+    html+='</div>';
+    if(state.completed) html+='<div class="progress-complete">&#127881; All steps complete! Total time: '+elapsedStr+'</div>';
+    html+='<button class="preflight-reset" onclick="resetProgress()">Reset Tracker</button>';
+    panel.innerHTML=html;
+}
+
+// ---- CAB/Change Request Export ----
+window.exportCAB=function(){
+    if(!lastPlan) return;
+    var risk=calculateRisk(lastPlan);
+    var selections={};
+    UPGRADE_ORDER.forEach(function(key){
+        var from=document.getElementById('from-'+key).value;
+        var to=document.getElementById('to-'+key).value;
+        if(from&&to&&from!==to) selections[key]={from:from,to:to};
+    });
+
+    var products=lastPlan.filter(function(s){return !s.error;}).map(function(s){
+        var prod=PRODUCT_MAP[s.key];
+        return {name:prod.product,from:getLabel(prod,s.from),to:getLabel(prod,s.to),hops:s.path.length-1};
+    });
+    var totalHops=products.reduce(function(a,p){return a+p.hops;},0);
+    var timeMap={vcenter:45,nsx:75,esxi:25,vsan:10,vcf:180};
+    var totalTime=lastPlan.filter(function(p){return !p.error;}).reduce(function(a,p){return a+((timeMap[p.key]||30)*(p.path.length-1));},0);
+
+    var cab='═══════════════════════════════════════════════════════════\n';
+    cab+='          CHANGE REQUEST — VMware Infrastructure Upgrade\n';
+    cab+='═══════════════════════════════════════════════════════════\n\n';
+    cab+='CHANGE ID:       CR-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-VMW\n';
+    cab+='DATE:            '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'\n';
+    cab+='REQUESTOR:       [Engineer Name]\n';
+    cab+='APPROVER:        [CAB Chair / Manager]\n';
+    cab+='CHANGE TYPE:     '+(risk.score>35?'Emergency/High-Risk':'Standard/Normal')+'\n';
+    cab+='RISK LEVEL:      '+risk.level+' (Score: '+risk.score+')\n';
+    cab+='PRIORITY:        '+(risk.score>55?'P1 - Critical':(risk.score>35?'P2 - High':'P3 - Medium'))+'\n\n';
+
+    cab+='───────────────────────────────────────────────────────────\n';
+    cab+='1. CHANGE DESCRIPTION\n';
+    cab+='───────────────────────────────────────────────────────────\n\n';
+    cab+='Upgrade VMware infrastructure components to target versions:\n\n';
+    products.forEach(function(p){
+        cab+='  • '+p.name+': '+p.from+' → '+p.to+' ('+p.hops+' hop'+(p.hops>1?'s':'')+')\n';
+    });
+    cab+='\nTotal version hops: '+totalHops+'\n';
+    cab+='Estimated duration: '+totalTime+' minutes ('+(totalTime/60).toFixed(1)+' hours)\n\n';
+
+    cab+='───────────────────────────────────────────────────────────\n';
+    cab+='2. BUSINESS JUSTIFICATION\n';
+    cab+='───────────────────────────────────────────────────────────\n\n';
+    cab+='  • Maintain vendor support coverage (End of Life avoidance)\n';
+    cab+='  • Security patching and vulnerability remediation\n';
+    cab+='  • Access to new features and performance improvements\n';
+    cab+='  • Interoperability with other upgraded infrastructure components\n';
+    cab+='  • [Add specific business driver here]\n\n';
+
+    cab+='───────────────────────────────────────────────────────────\n';
+    cab+='3. SCOPE & IMPACT\n';
+    cab+='───────────────────────────────────────────────────────────\n\n';
+    cab+='AFFECTED SYSTEMS:\n';
+    products.forEach(function(p){cab+='  • '+p.name+'\n';});
+    cab+='\nEXPECTED IMPACT:\n';
+    cab+='  • Management plane: Brief interruption during vCenter upgrade\n';
+    cab+='  • VM workloads: No downtime expected (rolling upgrade with DRS)\n';
+    cab+='  • Network: Momentary Edge failover for NSX traffic (2-5 sec)\n';
+    cab+='  • Storage: vSAN ODF upgrade is irreversible after completion\n\n';
+
+    cab+='───────────────────────────────────────────────────────────\n';
+    cab+='4. RISK ASSESSMENT\n';
+    cab+='───────────────────────────────────────────────────────────\n\n';
+    cab+='OVERALL RISK: '+risk.level+' (Score: '+risk.score+'/100)\n\n';
+    cab+='RISK FACTORS:\n';
+    risk.factors.forEach(function(f){cab+='  • '+f.label+' ('+f.val+')\n';});
+    cab+='\nMITIGATIONS:\n';
+    risk.factors.forEach(function(f){if(f.mitigation) cab+='  • '+f.mitigation+'\n';});
+    cab+='\n';
+
+    cab+='───────────────────────────────────────────────────────────\n';
+    cab+='5. ROLLBACK PLAN\n';
+    cab+='───────────────────────────────────────────────────────────\n\n';
+    lastPlan.forEach(function(plan){
+        if(plan.error) return;
+        var rb=ROLLBACK[plan.key];
+        if(rb){
+            cab+=''+PRODUCT_LABELS[plan.key]+': '+rb.summary+'\n';
+            cab+='  RTO: '+rb.rto+'\n\n';
+        }
+    });
+    cab+='ROLLBACK DECISION POINT: 30 minutes after each component upgrade\n';
+    cab+='ROLLBACK AUTHORITY: [Name/Role]\n\n';
+
+    cab+='───────────────────────────────────────────────────────────\n';
+    cab+='6. MAINTENANCE WINDOW\n';
+    cab+='───────────────────────────────────────────────────────────\n\n';
+    cab+='SCHEDULED START:   [DATE] [TIME] [TIMEZONE]\n';
+    cab+='SCHEDULED END:     [DATE] [TIME] [TIMEZONE]\n';
+    cab+='DURATION:          '+totalTime+' minutes + 60 min buffer = '+(totalTime+60)+' min\n';
+    cab+='CHANGE FREEZE:     N/A / [If applicable]\n\n';
+
+    cab+='───────────────────────────────────────────────────────────\n';
+    cab+='7. UPGRADE SEQUENCE\n';
+    cab+='───────────────────────────────────────────────────────────\n\n';
+    var seqN=0;
+    lastPlan.forEach(function(plan){
+        if(plan.error) return;
+        seqN++;
+        var prod=PRODUCT_MAP[plan.key];
+        var hops=plan.path.length-1;
+        cab+='Step '+seqN+': '+prod.product+' ('+getLabel(prod,plan.from)+' → '+getLabel(prod,plan.to)+')\n';
+        cab+='  Estimated time: ~'+((timeMap[plan.key]||30)*hops)+' minutes\n';
+        cab+='  Reason: '+DEP_REASONS[plan.key]+'\n\n';
+    });
+
+    cab+='───────────────────────────────────────────────────────────\n';
+    cab+='8. APPROVALS\n';
+    cab+='───────────────────────────────────────────────────────────\n\n';
+    cab+='Technical Lead:     _______________  Date: ___________\n';
+    cab+='Change Manager:     _______________  Date: ___________\n';
+    cab+='CAB Chair:          _______________  Date: ___________\n';
+    cab+='Business Owner:     _______________  Date: ___________\n\n';
+    cab+='═══════════════════════════════════════════════════════════\n';
+    cab+='Generated by VMware Upgrade Path Planner\n';
+    cab+='https://mustafamalqadi.github.io/vmware-upgrade-path/\n';
+    cab+='═══════════════════════════════════════════════════════════\n';
+
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(cab).then(function(){showToast('Change Request copied to clipboard!');});
+    } else {
+        var ta=document.createElement('textarea');ta.value=cab;ta.style.position='fixed';ta.style.left='-9999px';
+        document.body.appendChild(ta);ta.select();
+        try{document.execCommand('copy');showToast('CR copied!');}catch(e){}
+        document.body.removeChild(ta);
+    }
+};
+
 window.toggleAllDetails=function(btn){
     var contents=document.querySelectorAll('.detail-content');
     var toggles=document.querySelectorAll('.detail-toggle');
@@ -1956,6 +2340,9 @@ window.resetAll=function(){
     document.getElementById('btnExport').style.display='none';
     document.getElementById('btnCopyLink').style.display='none';
     document.getElementById('btnSavePlan').style.display='none';
+    document.getElementById('btnCAB').style.display='none';
+    document.getElementById('btnTracker').style.display='none';
+    document.getElementById('progressTracker').classList.remove('visible');
     document.getElementById('savedPlansPanel').classList.remove('visible');
     document.getElementById('maintCalc').classList.remove('visible');
     // Clear URL params
