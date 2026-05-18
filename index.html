@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
 :root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-card:#1c2128;--bg-card-hover:#262c34;--accent:#58a6ff;--accent-light:#79c0ff;--success:#3fb950;--success-light:#56d364;--danger:#f85149;--danger-light:#ff7b72;--warning:#d29922;--warning-light:#e3b341;--purple:#a78bfa;--purple-light:#c4b5fd;--orange:#f97316;--orange-light:#fb923c;--text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#6e7681;--border:#30363d}
+[data-theme="light"]{--bg-primary:#ffffff;--bg-secondary:#f6f8fa;--bg-card:#ffffff;--bg-card-hover:#f3f4f6;--text-primary:#1f2937;--text-secondary:#4b5563;--text-muted:#6b7280;--border:#d1d5db}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7;min-height:100vh}
@@ -23,6 +24,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 
 /* Header */
 .header{background:rgba(13,17,23,.85);border-bottom:1px solid var(--border);padding:1.25rem 2rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+[data-theme="light"] .header{background:rgba(255,255,255,.85)}
 .header-inner{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 .header-brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:inherit}
 .header-logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--success));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.7rem;color:#fff}
@@ -33,6 +35,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 .header-links{display:flex;gap:.75rem}
 .header-links a{color:var(--text-muted);text-decoration:none;font-size:.78rem;font-weight:500;transition:color .15s;display:flex;align-items:center;gap:.3rem}
 .header-links a:hover{color:var(--accent-light)}
+
+/* Theme toggle */
+.theme-toggle{background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:.35rem .55rem;cursor:pointer;color:var(--text-secondary);font-size:1rem;line-height:1;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.theme-toggle:hover{color:var(--accent-light);border-color:rgba(88,166,255,.3)}
 
 /* Container */
 .container{max-width:1300px;margin:0 auto;padding:2rem 2rem 4rem}
@@ -77,8 +83,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 .version-row select option{background:var(--bg-secondary);color:var(--text-primary)}
 .version-info{font-size:.65rem;color:var(--text-muted);margin-top:.25rem;min-height:1rem}
 
+/* EOL warning */
+.eol-warning{font-size:.68rem;color:var(--danger-light);margin-top:.2rem;display:none}
+.eol-warning.visible{display:block}
+
+/* EOL badge */
+.eol-badge{display:inline-block;padding:.1rem .45rem;border-radius:4px;font-size:.6rem;font-weight:700;background:rgba(248,81,73,.1);color:var(--danger-light);border:1px solid rgba(248,81,73,.25);margin-left:.4rem;vertical-align:middle}
+
+/* BOM auto-fill */
+.bom-autofill{display:none;font-size:.7rem;color:var(--accent-light);cursor:pointer;background:none;border:none;font-family:inherit;font-weight:600;padding:.2rem 0;text-decoration:underline;transition:color .15s}
+.bom-autofill:hover{color:var(--accent)}
+.bom-autofill.visible{display:block}
+
 /* Action bar */
-.action-bar{display:flex;justify-content:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.action-bar{display:flex;justify-content:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap;position:relative}
 .btn{padding:.7rem 2rem;border-radius:10px;border:1px solid var(--border);color:var(--text-primary);font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;background:var(--bg-secondary)}
 .btn:hover{transform:translateY(-2px);border-color:rgba(88,166,255,.3)}
 .btn-primary{background:linear-gradient(135deg,var(--accent),#2f81f7);border:none;color:#fff;box-shadow:0 4px 20px rgba(88,166,255,.2)}
@@ -86,6 +104,23 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 .btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 .btn svg{width:16px;height:16px;flex-shrink:0}
 .btn-sm{padding:.5rem 1.2rem;font-size:.78rem;border-radius:8px}
+
+/* Saved plans panel */
+.saved-plans-panel{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1rem;min-width:340px;max-width:420px;z-index:50;box-shadow:0 8px 32px rgba(0,0,0,.3);max-height:320px;overflow-y:auto}
+.saved-plans-panel.visible{display:block;animation:fadeSlide .2s ease}
+.saved-plans-panel h4{font-size:.82rem;font-weight:700;color:var(--text-secondary);margin-bottom:.6rem}
+.saved-plan-item{display:flex;align-items:center;gap:.5rem;padding:.5rem .65rem;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:.3rem;background:var(--bg-secondary);border:1px solid var(--border)}
+.saved-plan-item:hover{background:var(--bg-card-hover);border-color:rgba(88,166,255,.2)}
+.saved-plan-info{flex:1;overflow:hidden}
+.saved-plan-name{font-size:.78rem;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved-plan-meta{font-size:.65rem;color:var(--text-muted)}
+.saved-plan-delete{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.85rem;padding:.2rem .35rem;border-radius:4px;transition:all .15s;flex-shrink:0;line-height:1}
+.saved-plan-delete:hover{color:var(--danger-light);background:rgba(248,81,73,.08)}
+.saved-plans-empty{font-size:.75rem;color:var(--text-muted);text-align:center;padding:.5rem}
+
+/* Toast */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);padding:.65rem 1.25rem;border-radius:10px;font-size:.8rem;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:all .3s ease;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
 
 /* Interop warnings */
 .interop-panel{margin-bottom:2rem;display:none}
@@ -173,6 +208,37 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 .no-path h4{font-size:1rem;font-weight:700;color:var(--danger-light);margin-bottom:.3rem}
 .no-path p{font-size:.82rem;color:var(--text-secondary);max-width:420px;margin:0 auto}
 
+/* Rollback guidance */
+.rollback-box{padding:.65rem 1rem;border-radius:8px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.15);font-size:.75rem;color:var(--purple-light);margin-top:.5rem;line-height:1.6}
+.rollback-box strong{color:var(--purple-light)}
+
+/* HCL reminder */
+.hcl-reminder{padding:.55rem .9rem;border-radius:8px;background:rgba(88,166,255,.04);border:1px solid rgba(88,166,255,.15);font-size:.75rem;color:var(--accent-light);margin-top:.4rem;line-height:1.6}
+.hcl-reminder a{color:var(--accent-light);text-decoration:underline}
+
+/* Dependency tooltip */
+.dep-tooltip{position:relative;cursor:help}
+.dep-tooltip .dep-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:.5rem .75rem;font-size:.7rem;color:var(--text-secondary);white-space:nowrap;z-index:20;box-shadow:0 4px 16px rgba(0,0,0,.3);font-weight:400}
+.dep-tooltip:hover .dep-tip{display:block}
+
+/* Maintenance window calculator */
+.maint-calc{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.75rem;display:none}
+.maint-calc.visible{display:block;animation:fadeSlide .3s ease}
+.maint-calc h4{font-size:.85rem;font-weight:700;color:var(--text-secondary);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+.maint-calc-grid{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end}
+.maint-field{display:flex;flex-direction:column;gap:.25rem}
+.maint-field label{font-size:.68rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.maint-field input{width:100px;padding:.4rem .6rem;border-radius:8px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-primary);font-size:.82rem;font-family:inherit;outline:none;transition:border-color .15s}
+.maint-field input:focus{border-color:var(--accent)}
+.maint-result{font-size:.85rem;font-weight:600;color:var(--success-light);padding:.4rem .75rem;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.15);border-radius:8px;min-height:36px;display:flex;align-items:center;gap:.3rem}
+
+/* Path animation */
+@keyframes pathPulse{0%{transform:scale(1);box-shadow:none}50%{transform:scale(1.08);box-shadow:0 0 8px rgba(88,166,255,.3)}100%{transform:scale(1);box-shadow:none}}
+.path-node.animate{animation:pathPulse .4s ease}
+
+/* Keyboard hints */
+.kbd{display:inline-block;padding:.1rem .35rem;border-radius:4px;background:var(--bg-secondary);border:1px solid var(--border);font-size:.6rem;font-weight:700;color:var(--text-muted);font-family:'Inter',monospace;vertical-align:middle;margin-left:.35rem;line-height:1.3}
+
 /* Footer */
 .footer{border-top:1px solid var(--border);margin-top:4rem;padding:2rem;text-align:center;color:var(--text-muted);font-size:.75rem}
 .footer a{color:var(--text-secondary);text-decoration:none;transition:color .15s}
@@ -189,10 +255,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
     .hero-stats{gap:1rem}
     .action-bar{flex-direction:column;align-items:stretch}
     .btn{justify-content:center}
+    .saved-plans-panel{min-width:280px;left:0;transform:none}
 }
 @media(max-width:480px){.stack-selector{grid-template-columns:1fr}}
 @media print{
-    .header,.action-bar,.scroll-progress,.footer,.hero,.stack-selector{display:none!important}
+    .header,.action-bar,.scroll-progress,.footer,.hero,.stack-selector,.toast,.saved-plans-panel{display:none!important}
     .results,.timeline-section,.interop-panel,.stack-order{break-inside:avoid}
     .detail-content{display:block!important}
     body{background:#fff;color:#111}
@@ -216,6 +283,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
         <div class="header-right">
             <span class="header-badge">5 Products</span>
             <span class="header-badge" style="background:rgba(63,185,80,.08);color:var(--success-light);border-color:rgba(63,185,80,.2)">88+ Versions</span>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">&#127769;</button>
             <div class="header-links">
                 <a href="https://mustafamalqadi.github.io/vmware-kbs/">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -249,22 +317,44 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 
     <div class="stack-selector" id="stackSelector"></div>
 
-    <div class="action-bar">
+    <div class="action-bar" id="actionBar">
         <button class="btn btn-primary" id="btnGenerate" onclick="generatePlan()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Generate Upgrade Plan
+            Generate Upgrade Plan <span class="kbd">G</span>
         </button>
         <button class="btn" id="btnReset" onclick="resetAll()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-            Reset
+            Reset <span class="kbd">R</span>
         </button>
         <button class="btn" id="btnExport" onclick="exportPDF()" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Export PDF
+            Export PDF <span class="kbd">E</span>
         </button>
+        <button class="btn" id="btnCopyLink" onclick="copyLink()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Copy Link
+        </button>
+        <button class="btn" id="btnSavePlan" onclick="savePlan()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Plan
+        </button>
+        <button class="btn" id="btnSavedPlans" onclick="toggleSavedPlans()" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
+            Saved Plans
+        </button>
+        <div class="saved-plans-panel" id="savedPlansPanel"></div>
     </div>
 
     <div class="interop-panel" id="interopPanel"></div>
+    <div class="maint-calc" id="maintCalc">
+        <h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Maintenance Window Calculator</h4>
+        <div class="maint-calc-grid">
+            <div class="maint-field"><label>ESXi Hosts</label><input type="number" id="calcHosts" min="1" max="200" value="4" oninput="recalcMaint()"></div>
+            <div class="maint-field"><label>Hosts / Batch</label><input type="number" id="calcBatch" min="1" max="50" value="2" oninput="recalcMaint()"></div>
+            <div class="maint-field"><label>Parallel VMs</label><input type="number" id="calcVMs" min="0" max="1000" value="50" oninput="recalcMaint()"></div>
+            <div class="maint-result" id="maintResult">-</div>
+        </div>
+    </div>
     <div class="results" id="results"></div>
     <div class="timeline-section" id="timelineSection"></div>
 </div>
@@ -274,6 +364,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
     <p><a href="https://mustafamalqadi.github.io/vmware-kbs/">&larr; Knowledge Bases</a> &nbsp;|&nbsp; <a href="https://mustafamalqadi.github.io/">Portal</a> &nbsp;|&nbsp; <a href="https://github.com/mustafamalqadi/vmware-upgrade-path" target="_blank" rel="noopener">GitHub</a></p>
     <p>&copy; 2026 Eng. Mustafa Al-Qadi</p>
 </footer>
+
+<div class="toast" id="toast"></div>
 
 <script src="data/vcenter-paths.js"></script>
 <script src="data/esxi-paths.js"></script>
@@ -291,6 +383,8 @@ var PRODUCT_MAP = {vcenter:VCENTER_DATA, esxi:ESXI_DATA, vsan:VSAN_DATA, nsx:NSX
 var PRODUCT_LABELS = {vcenter:'vCenter', nsx:'NSX', esxi:'ESXi', vsan:'vSAN ODF', vcf:'VCF/SDDC'};
 var STEP_CLASSES = {vcenter:'step-vcenter', nsx:'step-nsx', esxi:'step-esxi', vsan:'step-vsan', vcf:'step-vcf'};
 var COLORS = {vcenter:'#58a6ff', nsx:'#a78bfa', esxi:'#3fb950', vsan:'#d29922', vcf:'#f97316'};
+var STORAGE_KEY = 'vmware-upgrade-plans';
+var THEME_KEY = 'vmware-upgrade-theme';
 
 // Scroll progress
 window.addEventListener('scroll',function(){
@@ -298,6 +392,113 @@ window.addEventListener('scroll',function(){
     document.getElementById('scrollProgress').style.width=(h>0?(window.scrollY/h)*100:0)+'%';
 },{passive:true});
 
+// ---- Toast ----
+var toastTimer=null;
+window.showToast=function(msg){
+    var el=document.getElementById('toast');
+    el.textContent=msg;
+    el.classList.add('visible');
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer=setTimeout(function(){el.classList.remove('visible');},2000);
+};
+
+// ---- Theme ----
+function loadTheme(){
+    var saved=localStorage.getItem(THEME_KEY);
+    if(saved==='light'){
+        document.documentElement.setAttribute('data-theme','light');
+        document.getElementById('themeToggle').innerHTML='&#9728;&#65039;';
+    }
+}
+
+window.toggleTheme=function(){
+    var html=document.documentElement;
+    var btn=document.getElementById('themeToggle');
+    if(html.getAttribute('data-theme')==='light'){
+        html.removeAttribute('data-theme');
+        btn.innerHTML='&#127769;';
+        localStorage.setItem(THEME_KEY,'dark');
+    } else {
+        html.setAttribute('data-theme','light');
+        btn.innerHTML='&#9728;&#65039;';
+        localStorage.setItem(THEME_KEY,'light');
+    }
+};
+
+// ---- Keyboard Shortcuts ----
+document.addEventListener('keydown',function(e){
+    // Don't trigger when typing in inputs
+    if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA') return;
+    var key=e.key.toLowerCase();
+    if(key==='g'){e.preventDefault();generatePlan();}
+    else if(key==='r'){e.preventDefault();resetAll();}
+    else if(key==='e'&&document.getElementById('btnExport').style.display!=='none'){e.preventDefault();exportPDF();}
+});
+
+// ---- Dependency explanations ----
+var DEP_REASONS={
+    vcenter:'Upgrade first — all hosts & plugins depend on vCenter APIs',
+    nsx:'Upgrade after vCenter — NSX Manager plugin must match vCenter version',
+    esxi:'Upgrade after vCenter & NSX — hosts register with updated management plane',
+    vsan:'Upgrade ODF last — runs on ESXi hosts, requires new host version first',
+    vcf:'SDDC Manager orchestrates the entire stack upgrade sequence'
+};
+
+// ---- Rollback guidance ----
+var ROLLBACK={
+    vcenter:'<strong>Rollback:</strong> Restore vCenter from file-based backup or VM snapshot taken before upgrade. VCSA snapshots must be taken at the appliance level.',
+    nsx:'<strong>Rollback:</strong> NSX Manager can be restored from backup. Edge nodes can be redeployed. Host transport nodes revert by removing VIBs.',
+    esxi:'<strong>Rollback:</strong> ESXi can be rolled back via <code>altbootbank</code> (reboot and select previous build). Ensure you have a host profile backup.',
+    vsan:'<strong>Rollback:</strong> vSAN ODF upgrades are ONE-WAY and CANNOT be rolled back. Ensure cluster health is green before proceeding.',
+    vcf:'<strong>Rollback:</strong> SDDC Manager upgrade can be restored from its internal backup. VCF component rollbacks follow individual product procedures.'
+};
+
+// ---- HCL URL ----
+var HCL_URL='https://www.vmware.com/resources/compatibility/search.php';
+
+// ---- Maintenance Window Calculator ----
+window.recalcMaint=function(){
+    var hosts=parseInt(document.getElementById('calcHosts').value)||1;
+    var batch=parseInt(document.getElementById('calcBatch').value)||1;
+    var vms=parseInt(document.getElementById('calcVMs').value)||0;
+    if(batch>hosts) batch=hosts;
+    if(!lastPlan||lastPlan.length===0){
+        document.getElementById('maintResult').textContent='Generate a plan first';
+        return;
+    }
+    var timeMap={vcenter:45,nsx:75,esxi:25,vsan:10,vcf:180};
+    var total=0;
+    lastPlan.forEach(function(p){
+        if(p.error) return;
+        var hops=p.path.length-1;
+        if(p.key==='esxi'){
+            // Per-batch: evacuate VMs + upgrade + reboot per host
+            var batches=Math.ceil(hosts/batch);
+            var evacuateTime=Math.ceil(vms/hosts)*2; // ~2 min per VM migration
+            var perBatch=(timeMap.esxi*hops)+evacuateTime+10; // +10 for DRS settle
+            total+=perBatch*batches;
+        } else {
+            total+=(timeMap[p.key]||30)*hops;
+        }
+    });
+    var hrs=Math.floor(total/60);
+    var mins=total%60;
+    var result=document.getElementById('maintResult');
+    result.innerHTML='&#128337; ~'+(hrs>0?hrs+'h ':'')+(mins>0?mins+'m':'')+' total window ('+hosts+' hosts, '+Math.ceil(hosts/(batch||1))+' batches)';
+};
+
+// ---- Animate path nodes ----
+function animatePath(){
+    var nodes=document.querySelectorAll('.path-node');
+    nodes.forEach(function(node,idx){
+        setTimeout(function(){
+            node.classList.add('animate');
+            setTimeout(function(){node.classList.remove('animate');},500);
+        },idx*120);
+    });
+}
+
+// ---- Build selectors ----
 function buildSelectors(){
     var c=document.getElementById('stackSelector');
     UPGRADE_ORDER.forEach(function(key,idx){
@@ -306,28 +507,30 @@ function buildSelectors(){
         card.className='product-card';
         card.id='card-'+key;
         card.setAttribute('data-product',key);
+        var versionsHtml=prod.versions.map(function(v){return '<option value="'+v.id+'">'+v.label+(v.eol?' (EOL)':'')+'</option>';}).join('');
         card.innerHTML=
             '<div class="pc-header">'+
                 '<span class="pc-icon">'+prod.icon+'</span>'+
                 '<span class="pc-name">'+prod.product+'</span>'+
                 '<span class="pc-order">'+(idx+1)+'</span>'+
             '</div>'+
-            '<div class="version-row"><label>From</label><select id="from-'+key+'" onchange="onVersionChange(\''+key+'\')"><option value="">\u2014 Skip \u2014</option>'+
-                prod.versions.map(function(v){return '<option value="'+v.id+'">'+v.label+(v.eol?' (EOL)':'')+'</option>';}).join('')+
-            '</select></div>'+
-            '<div class="version-row"><label>To</label><select id="to-'+key+'" onchange="onVersionChange(\''+key+'\')"><option value="">\u2014 Skip \u2014</option>'+
-                prod.versions.map(function(v){return '<option value="'+v.id+'">'+v.label+(v.eol?' (EOL)':'')+'</option>';}).join('')+
-            '</select></div>'+
-            '<div class="version-info" id="info-'+key+'"></div>';
+            '<div class="version-row"><label>From</label><select id="from-'+key+'" onchange="onVersionChange(\''+key+'\')"><option value="">\u2014 Skip \u2014</option>'+versionsHtml+'</select></div>'+
+            '<div class="version-row"><label>To</label><select id="to-'+key+'" onchange="onVersionChange(\''+key+'\')"><option value="">\u2014 Skip \u2014</option>'+versionsHtml+'</select></div>'+
+            '<div class="version-info" id="info-'+key+'"></div>'+
+            '<div class="eol-warning" id="eol-'+key+'">&#9888; This version is end-of-life</div>'+
+            (key==='vcf'?'<button class="bom-autofill" id="bomAutofill" onclick="applyBOM()">&#9881; Auto-fill BOM versions</button>':'');
         c.appendChild(card);
     });
 }
 
+// ---- Version change handler ----
 window.onVersionChange=function(key){
     var from=document.getElementById('from-'+key).value;
     var to=document.getElementById('to-'+key).value;
     var card=document.getElementById('card-'+key);
     var info=document.getElementById('info-'+key);
+    var eolEl=document.getElementById('eol-'+key);
+
     if(from&&to&&from!==to){
         card.classList.add('active');
         var prod=PRODUCT_MAP[key];
@@ -337,12 +540,62 @@ window.onVersionChange=function(key){
         if(fv&&fv.build) parts.push('Build '+fv.build+' \u2192 '+(tv?tv.build:''));
         if(fv&&fv.release&&tv&&tv.release) parts.push(fv.release+' \u2192 '+tv.release);
         info.textContent=parts.join(' \u00B7 ');
+
+        // EOL warning
+        if(tv&&tv.eol){
+            eolEl.classList.add('visible');
+        } else {
+            eolEl.classList.remove('visible');
+        }
     } else {
         card.classList.remove('active');
         info.textContent='';
+        eolEl.classList.remove('visible');
+    }
+
+    // VCF BOM auto-fill button visibility
+    if(key==='vcf'){
+        var bomBtn=document.getElementById('bomAutofill');
+        if(bomBtn){
+            var vcfTo=document.getElementById('to-vcf').value;
+            if(vcfTo&&INTEROP_RULES.vcfBom&&INTEROP_RULES.vcfBom[vcfTo]){
+                bomBtn.classList.add('visible');
+            } else {
+                bomBtn.classList.remove('visible');
+            }
+        }
     }
 };
 
+// ---- BOM auto-fill ----
+window.applyBOM=function(){
+    var vcfTo=document.getElementById('to-vcf').value;
+    if(!vcfTo||!INTEROP_RULES.vcfBom||!INTEROP_RULES.vcfBom[vcfTo]) return;
+    var bom=INTEROP_RULES.vcfBom[vcfTo];
+    var applied=[];
+    Object.keys(bom).forEach(function(prodKey){
+        var sel=document.getElementById('to-'+prodKey);
+        if(sel){
+            var targetVal=bom[prodKey];
+            // Check if this option exists
+            for(var i=0;i<sel.options.length;i++){
+                if(sel.options[i].value===targetVal){
+                    sel.value=targetVal;
+                    onVersionChange(prodKey);
+                    applied.push(PRODUCT_LABELS[prodKey]||prodKey);
+                    break;
+                }
+            }
+        }
+    });
+    var vcfLabel=vcfTo;
+    var vcfProd=PRODUCT_MAP.vcf;
+    var vcfVer=vcfProd.versions.find(function(v){return v.id===vcfTo;});
+    if(vcfVer) vcfLabel=vcfVer.label;
+    showToast('BOM versions applied for ' + vcfLabel);
+};
+
+// ---- Path finding ----
 function findPath(graph,start,end){
     if(start===end) return [start];
     if(!graph[start]) return null;
@@ -363,6 +616,8 @@ function findPath(graph,start,end){
 
 function getLabel(prod,id){var v=prod.versions.find(function(x){return x.id===id;});return v?v.label:id;}
 
+function isEOL(prod,id){var v=prod.versions.find(function(x){return x.id===id;});return v&&v.eol;}
+
 function getPreChecks(prod,from,to){
     var checks=(prod.preChecks._default||[]).slice();
     var k=from+'\u2192'+to;
@@ -379,6 +634,203 @@ function getPreChecks(prod,from,to){
     return checks;
 }
 
+// ---- URL sharing ----
+function updateURL(selections){
+    var params=[];
+    UPGRADE_ORDER.forEach(function(key){
+        if(selections[key]){
+            params.push(encodeURIComponent(key)+'='+encodeURIComponent(selections[key].from)+'\u2192'+encodeURIComponent(selections[key].to));
+        }
+    });
+    var qs=params.length>0?'?'+params.join('&'):'';
+    history.replaceState(null,'',window.location.pathname+qs);
+}
+
+function loadFromURL(){
+    var search=window.location.search;
+    if(!search||search.length<2) return;
+    var qs=search.substring(1);
+    var pairs=qs.split('&');
+    var found=false;
+    pairs.forEach(function(pair){
+        var eq=pair.indexOf('=');
+        if(eq<0) return;
+        var key=decodeURIComponent(pair.substring(0,eq));
+        var val=decodeURIComponent(pair.substring(eq+1));
+        var arrow=val.indexOf('\u2192');
+        if(arrow<0) return;
+        var fromVal=val.substring(0,arrow);
+        var toVal=val.substring(arrow+1);
+        if(UPGRADE_ORDER.indexOf(key)>=0){
+            var fromSel=document.getElementById('from-'+key);
+            var toSel=document.getElementById('to-'+key);
+            if(fromSel&&toSel){
+                fromSel.value=fromVal;
+                toSel.value=toVal;
+                onVersionChange(key);
+                found=true;
+            }
+        }
+    });
+    if(found){
+        setTimeout(function(){generatePlan();},100);
+    }
+}
+
+window.copyLink=function(){
+    var selections={};
+    UPGRADE_ORDER.forEach(function(key){
+        var from=document.getElementById('from-'+key).value;
+        var to=document.getElementById('to-'+key).value;
+        if(from&&to&&from!==to) selections[key]={from:from,to:to};
+    });
+    updateURL(selections);
+    var url=window.location.href;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(function(){
+            showToast('Copied! Link is ready to share.');
+        },function(){
+            fallbackCopy(url);
+        });
+    } else {
+        fallbackCopy(url);
+    }
+};
+
+function fallbackCopy(text){
+    var ta=document.createElement('textarea');
+    ta.value=text;
+    ta.style.position='fixed';
+    ta.style.left='-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try{document.execCommand('copy');showToast('Copied! Link is ready to share.');}
+    catch(e){showToast('Could not copy link.');}
+    document.body.removeChild(ta);
+}
+
+// ---- Save/Load Plans ----
+function getSavedPlans(){
+    try{var raw=localStorage.getItem(STORAGE_KEY);return raw?JSON.parse(raw):[];}
+    catch(e){return [];}
+}
+
+function setSavedPlans(plans){
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(plans));
+}
+
+window.savePlan=function(){
+    var name=prompt('Enter a name for this upgrade plan:');
+    if(!name||!name.trim()) return;
+    name=name.trim();
+    var selections={};
+    var products=[];
+    UPGRADE_ORDER.forEach(function(key){
+        var from=document.getElementById('from-'+key).value;
+        var to=document.getElementById('to-'+key).value;
+        if(from&&to&&from!==to){
+            selections[key]={from:from,to:to};
+            products.push(PRODUCT_LABELS[key]);
+        }
+    });
+    if(Object.keys(selections).length===0){showToast('No products selected.');return;}
+    var plans=getSavedPlans();
+    plans.push({
+        name:name,
+        date:new Date().toISOString(),
+        selections:selections,
+        products:products
+    });
+    setSavedPlans(plans);
+    updateSavedPlansButton();
+    showToast('Plan "'+name+'" saved!');
+};
+
+window.loadPlan=function(index){
+    var plans=getSavedPlans();
+    if(index<0||index>=plans.length) return;
+    var plan=plans[index];
+    // Reset first
+    UPGRADE_ORDER.forEach(function(key){
+        document.getElementById('from-'+key).value='';
+        document.getElementById('to-'+key).value='';
+        document.getElementById('card-'+key).classList.remove('active');
+        document.getElementById('info-'+key).textContent='';
+        document.getElementById('eol-'+key).classList.remove('visible');
+    });
+    // Apply selections
+    Object.keys(plan.selections).forEach(function(key){
+        var sel=plan.selections[key];
+        document.getElementById('from-'+key).value=sel.from;
+        document.getElementById('to-'+key).value=sel.to;
+        onVersionChange(key);
+    });
+    // Hide panel and generate
+    document.getElementById('savedPlansPanel').classList.remove('visible');
+    setTimeout(function(){generatePlan();},50);
+};
+
+window.deletePlan=function(index){
+    var plans=getSavedPlans();
+    if(index<0||index>=plans.length) return;
+    var name=plans[index].name;
+    plans.splice(index,1);
+    setSavedPlans(plans);
+    updateSavedPlansButton();
+    renderSavedPlans();
+    showToast('Plan "'+name+'" deleted.');
+};
+
+window.toggleSavedPlans=function(){
+    var panel=document.getElementById('savedPlansPanel');
+    if(panel.classList.contains('visible')){
+        panel.classList.remove('visible');
+    } else {
+        renderSavedPlans();
+        panel.classList.add('visible');
+    }
+};
+
+function renderSavedPlans(){
+    var panel=document.getElementById('savedPlansPanel');
+    var plans=getSavedPlans();
+    if(plans.length===0){
+        panel.innerHTML='<h4>Saved Plans</h4><div class="saved-plans-empty">No saved plans yet.</div>';
+        return;
+    }
+    var html='<h4>Saved Plans ('+plans.length+')</h4>';
+    plans.forEach(function(p,idx){
+        var d=new Date(p.date);
+        var dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        html+='<div class="saved-plan-item" onclick="loadPlan('+idx+')">'+
+            '<div class="saved-plan-info">'+
+                '<div class="saved-plan-name">'+escapeHTML(p.name)+'</div>'+
+                '<div class="saved-plan-meta">'+dateStr+' &middot; '+p.products.join(', ')+'</div>'+
+            '</div>'+
+            '<button class="saved-plan-delete" onclick="event.stopPropagation();deletePlan('+idx+')" title="Delete plan">&times;</button>'+
+        '</div>';
+    });
+    panel.innerHTML=html;
+}
+
+function updateSavedPlansButton(){
+    var plans=getSavedPlans();
+    var btn=document.getElementById('btnSavedPlans');
+    if(plans.length>0){
+        btn.style.display='';
+    } else {
+        btn.style.display='none';
+        document.getElementById('savedPlansPanel').classList.remove('visible');
+    }
+}
+
+function escapeHTML(str){
+    var div=document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
+// ---- Generate Plan ----
 var lastPlan=null;
 
 window.generatePlan=function(){
@@ -429,7 +881,7 @@ window.generatePlan=function(){
     if(active.length>1){
         html+='<div class="stack-order"><h4>&#9888;&#65039; Correct Upgrade Order'+(vcfSelected?' (VCF Orchestrated)':'')+'</h4><div class="order-flow">';
         active.forEach(function(key,idx){
-            html+='<span class="order-chip" style="background:'+COLORS[key]+'12;color:'+COLORS[key]+';border:1px solid '+COLORS[key]+'40;">'+PRODUCT_LABELS[key]+'</span>';
+            html+='<span class="order-chip dep-tooltip" style="background:'+COLORS[key]+'12;color:'+COLORS[key]+';border:1px solid '+COLORS[key]+'40;">'+PRODUCT_LABELS[key]+'<span class="dep-tip">'+DEP_REASONS[key]+'</span></span>';
             if(idx<active.length-1) html+='<span class="order-arrow">\u2192</span>';
         });
         html+='</div></div>';
@@ -440,6 +892,8 @@ window.generatePlan=function(){
         resultsDiv.innerHTML=html;resultsDiv.classList.add('visible');
         document.getElementById('timelineSection').classList.remove('visible');
         document.getElementById('btnExport').style.display='none';
+        document.getElementById('btnCopyLink').style.display='none';
+        document.getElementById('btnSavePlan').style.display='none';
         return;
     }
 
@@ -463,10 +917,11 @@ window.generatePlan=function(){
         var postChecks=prod.postChecks||[];
         var ki=prod.knownIssues?prod.knownIssues[plan.to]||prod.knownIssues[plan.to.split('u')[0]]:null;
         var dt=prod.estimatedDowntime?prod.estimatedDowntime._default:'N/A';
+        var targetEol=isEOL(prod,plan.to);
 
         html+='<div class="step-card '+STEP_CLASSES[plan.key]+'">';
         html+='<span class="step-num">'+stepNum+'</span>';
-        html+='<h4><span>'+prod.icon+'</span> '+prod.product+'</h4>';
+        html+='<h4><span>'+prod.icon+'</span> '+prod.product+(targetEol?' <span class="eol-badge">EOL</span>':'')+'</h4>';
         html+='<div class="step-subtitle">'+getLabel(prod,plan.from)+' \u2192 '+getLabel(prod,plan.to)+' &nbsp;\u00B7&nbsp; '+hops+' hop'+(hops>1?'s':'')+' &nbsp;\u00B7&nbsp; ~'+dt+'</div>';
 
         html+='<div class="step-path">';
@@ -516,6 +971,12 @@ window.generatePlan=function(){
         // Known issue
         if(ki) html+='<div class="known-issue">&#9888;&#65039; <strong>Known Issue:</strong> '+ki+'</div>';
 
+        // Rollback guidance
+        if(ROLLBACK[plan.key]) html+='<div class="rollback-box">&#128260; '+ROLLBACK[plan.key]+'</div>';
+
+        // HCL reminder for ESXi
+        if(plan.key==='esxi') html+='<div class="hcl-reminder">&#128187; <strong>HCL Check:</strong> Verify server model + ESXi '+getLabel(prod,plan.to)+' on the <a href="'+HCL_URL+'" target="_blank" rel="noopener">VMware HCL</a> before upgrading. Check IO devices, storage controllers, and NICs.</div>';
+
         html+='</div></div>';
     });
 
@@ -526,8 +987,25 @@ window.generatePlan=function(){
     // Timeline
     buildTimeline(stepPlans);
 
-    // Show export button
+    // Show action buttons
     document.getElementById('btnExport').style.display='';
+    document.getElementById('btnCopyLink').style.display='';
+    document.getElementById('btnSavePlan').style.display='';
+
+    // Show maintenance calculator if ESXi is selected
+    var maintCalc=document.getElementById('maintCalc');
+    if(selections.esxi){
+        maintCalc.classList.add('visible');
+        recalcMaint();
+    } else {
+        maintCalc.classList.remove('visible');
+    }
+
+    // Update URL
+    updateURL(selections);
+
+    // Animate path nodes
+    setTimeout(function(){animatePath();},200);
 
     resultsDiv.scrollIntoView({behavior:'smooth',block:'start'});
 };
@@ -584,13 +1062,22 @@ window.resetAll=function(){
         document.getElementById('to-'+key).value='';
         document.getElementById('card-'+key).classList.remove('active');
         document.getElementById('info-'+key).textContent='';
+        document.getElementById('eol-'+key).classList.remove('visible');
     });
+    var bomBtn=document.getElementById('bomAutofill');
+    if(bomBtn) bomBtn.classList.remove('visible');
     document.getElementById('results').innerHTML='';
     document.getElementById('results').classList.remove('visible');
     document.getElementById('interopPanel').innerHTML='';
     document.getElementById('interopPanel').classList.remove('visible');
     document.getElementById('timelineSection').classList.remove('visible');
     document.getElementById('btnExport').style.display='none';
+    document.getElementById('btnCopyLink').style.display='none';
+    document.getElementById('btnSavePlan').style.display='none';
+    document.getElementById('savedPlansPanel').classList.remove('visible');
+    document.getElementById('maintCalc').classList.remove('visible');
+    // Clear URL params
+    history.replaceState(null,'',window.location.pathname);
     window.scrollTo({top:0,behavior:'smooth'});
 };
 
@@ -621,7 +1108,21 @@ window.exportPDF=function(){
     setTimeout(function(){win.print();},400);
 };
 
+// ---- Init ----
 buildSelectors();
+loadTheme();
+updateSavedPlansButton();
+loadFromURL();
+
+// Close saved plans panel when clicking outside
+document.addEventListener('click',function(e){
+    var panel=document.getElementById('savedPlansPanel');
+    var btn=document.getElementById('btnSavedPlans');
+    if(panel.classList.contains('visible')&&!panel.contains(e.target)&&e.target!==btn&&!btn.contains(e.target)){
+        panel.classList.remove('visible');
+    }
+});
+
 })();
 </script>
 </body>
