@@ -1,103 +1,103 @@
-/**
- * ESXi Upgrade Paths
- * Based on VMware official documentation and interoperability matrix.
- * Last updated: 2026-05-18
- */
 const ESXI_DATA = {
-    product: "ESXi",
-    icon: "&#128421;",
-    color: "#3fb950",
-    versions: [
-        { id: "6.5",    label: "6.5",     eol: true,  release: "2016-11" },
-        { id: "6.5u1",  label: "6.5 U1",  eol: true,  release: "2017-07" },
-        { id: "6.5u2",  label: "6.5 U2",  eol: true,  release: "2018-05" },
-        { id: "6.5u3",  label: "6.5 U3",  eol: true,  release: "2019-04" },
-        { id: "6.7",    label: "6.7",     eol: true,  release: "2018-04" },
-        { id: "6.7u1",  label: "6.7 U1",  eol: true,  release: "2018-10" },
-        { id: "6.7u2",  label: "6.7 U2",  eol: true,  release: "2019-04" },
-        { id: "6.7u3",  label: "6.7 U3",  eol: true,  release: "2019-08" },
-        { id: "7.0",    label: "7.0",     eol: false, release: "2020-04" },
-        { id: "7.0u1",  label: "7.0 U1",  eol: false, release: "2020-10" },
-        { id: "7.0u2",  label: "7.0 U2",  eol: false, release: "2021-03" },
-        { id: "7.0u3",  label: "7.0 U3",  eol: false, release: "2022-01" },
-        { id: "7.0u3n", label: "7.0 U3n", eol: false, release: "2023-07" },
-        { id: "7.0u3p", label: "7.0 U3p", eol: false, release: "2023-10" },
-        { id: "8.0",    label: "8.0",     eol: false, release: "2022-10" },
-        { id: "8.0u1",  label: "8.0 U1",  eol: false, release: "2023-04" },
-        { id: "8.0u2",  label: "8.0 U2",  eol: false, release: "2023-09" },
-        { id: "8.0u3",  label: "8.0 U3",  eol: false, release: "2024-06" },
-        { id: "8.0u3a", label: "8.0 U3a", eol: false, release: "2024-09" },
-        { id: "8.0u3b", label: "8.0 U3b", eol: false, release: "2024-12" },
-        { id: "8.0u3c", label: "8.0 U3c", eol: false, release: "2025-03" }
+  product: "ESXi",
+  icon: "&#128421;",
+  color: "#3fb950",
+  versions: [
+    { id: "6.5", label: "6.5", eol: true, release: "2016-11", build: "4564106" },
+    { id: "6.5u1", label: "6.5 U1", eol: true, release: "2017-07", build: "5969303" },
+    { id: "6.5u2", label: "6.5 U2", eol: true, release: "2018-05", build: "8294253" },
+    { id: "6.5u3", label: "6.5 U3", eol: true, release: "2019-04", build: "13932383" },
+    { id: "6.7", label: "6.7", eol: true, release: "2018-04", build: "8169922" },
+    { id: "6.7u1", label: "6.7 U1", eol: true, release: "2018-10", build: "10302608" },
+    { id: "6.7u2", label: "6.7 U2", eol: true, release: "2019-04", build: "13006603" },
+    { id: "6.7u3", label: "6.7 U3", eol: true, release: "2019-08", build: "14320388" },
+    { id: "7.0", label: "7.0", eol: false, release: "2020-04", build: "15843807" },
+    { id: "7.0u1", label: "7.0 U1", eol: false, release: "2020-10", build: "16850804" },
+    { id: "7.0u2", label: "7.0 U2", eol: false, release: "2021-03", build: "17630552" },
+    { id: "7.0u3", label: "7.0 U3", eol: false, release: "2021-10", build: "19193900" },
+    { id: "7.0u3n", label: "7.0 U3n", eol: false, release: "2023-03", build: "21930508" },
+    { id: "7.0u3p", label: "7.0 U3p", eol: false, release: "2023-07", build: "22348816" },
+    { id: "8.0", label: "8.0", eol: false, release: "2022-10", build: "20513097" },
+    { id: "8.0u1", label: "8.0 U1", eol: false, release: "2023-04", build: "21495797" },
+    { id: "8.0u2", label: "8.0 U2", eol: false, release: "2023-09", build: "22380479" },
+    { id: "8.0u3", label: "8.0 U3", eol: false, release: "2024-06", build: "24022510" },
+    { id: "8.0u3a", label: "8.0 U3a", eol: false, release: "2024-08", build: "24280767" },
+    { id: "8.0u3b", label: "8.0 U3b", eol: false, release: "2024-11", build: "24585291" },
+    { id: "8.0u3c", label: "8.0 U3c", eol: false, release: "2025-02", build: "25012014" }
+  ],
+  paths: {
+    "6.5": ["6.5u1"],
+    "6.5u1": ["6.5u2"],
+    "6.5u2": ["6.5u3"],
+    "6.5u3": ["6.7u3", "7.0"],
+    "6.7": ["6.7u1"],
+    "6.7u1": ["6.7u2"],
+    "6.7u2": ["6.7u3"],
+    "6.7u3": ["7.0", "7.0u1", "7.0u2", "7.0u3"],
+    "7.0": ["7.0u1", "7.0u2", "7.0u3", "8.0"],
+    "7.0u1": ["7.0u2", "7.0u3", "8.0"],
+    "7.0u2": ["7.0u3", "8.0", "8.0u1"],
+    "7.0u3": ["7.0u3n", "7.0u3p", "8.0", "8.0u1", "8.0u2", "8.0u3"],
+    "7.0u3n": ["7.0u3p", "8.0u2", "8.0u3"],
+    "7.0u3p": ["8.0u2", "8.0u3"],
+    "8.0": ["8.0u1", "8.0u2", "8.0u3"],
+    "8.0u1": ["8.0u2", "8.0u3"],
+    "8.0u2": ["8.0u3", "8.0u3a", "8.0u3b", "8.0u3c"],
+    "8.0u3": ["8.0u3a", "8.0u3b", "8.0u3c"],
+    "8.0u3a": ["8.0u3b", "8.0u3c"],
+    "8.0u3b": ["8.0u3c"],
+    "8.0u3c": []
+  },
+  preChecks: {
+    _default: [
+      "Place host in maintenance mode: esxcli system maintenanceMode set --enable true",
+      "Verify boot device health: esxcli storage core device list | grep -i boot",
+      "Check VMware Hardware Compatibility List (HCL) for target ESXi version",
+      "List installed VIBs and verify compatibility: esxcli software vib list",
+      "Verify sufficient boot device capacity: esxcli storage filesystem list",
+      "Ensure no active vMotion or Storage vMotion tasks on the host",
+      "Confirm NTP is synchronized: esxcli system time get && esxcli hardware clock get",
+      "Check host profile compliance if using Host Profiles (vLCM or legacy)"
     ],
-    paths: {
-        "6.5":    ["6.5u1"],
-        "6.5u1":  ["6.5u2"],
-        "6.5u2":  ["6.5u3"],
-        "6.5u3":  ["6.7u3", "7.0"],
-        "6.7":    ["6.7u1"],
-        "6.7u1":  ["6.7u2"],
-        "6.7u2":  ["6.7u3"],
-        "6.7u3":  ["7.0", "7.0u1", "7.0u2", "7.0u3"],
-        "7.0":    ["7.0u1", "7.0u2", "7.0u3"],
-        "7.0u1":  ["7.0u2", "7.0u3", "8.0"],
-        "7.0u2":  ["7.0u3", "8.0", "8.0u1"],
-        "7.0u3":  ["7.0u3n", "7.0u3p", "8.0", "8.0u1", "8.0u2", "8.0u3"],
-        "7.0u3n": ["7.0u3p", "8.0u2", "8.0u3"],
-        "7.0u3p": ["8.0u2", "8.0u3"],
-        "8.0":    ["8.0u1", "8.0u2", "8.0u3"],
-        "8.0u1":  ["8.0u2", "8.0u3"],
-        "8.0u2":  ["8.0u3", "8.0u3a", "8.0u3b", "8.0u3c"],
-        "8.0u3":  ["8.0u3a", "8.0u3b", "8.0u3c"],
-        "8.0u3a": ["8.0u3b", "8.0u3c"],
-        "8.0u3b": ["8.0u3c"],
-        "8.0u3c": []
-    },
-    preChecks: {
-        _default: [
-            "Verify vCenter is already upgraded to a version ≥ target ESXi version",
-            "Place host in maintenance mode (evacuate all VMs via DRS or manually)",
-            "Check boot device has sufficient space (≥ 32GB recommended for 8.x)",
-            "Verify hardware compatibility (CPU, NIC, HBA) against VMware HCL",
-            "Document current VIB list: esxcli software vib list > /tmp/vibs-before.txt",
-            "Check for 3rd-party VIBs that may block upgrade (community-supported level)",
-            "Disable Secure Boot temporarily if custom VIBs are installed",
-            "Backup host configuration: vim-cmd hostsvc/firmware/backup_config"
-        ],
-        "6.7u3→7.0": [
-            "Legacy CentOS-based ESXi replaced with Photon — boot partition layout changes",
-            "USB/SD card boot deprecated in 7.0 U3+ (still works but unsupported for new installs)",
-            "Check VMFS-5 datastores — still supported but consider upgrade to VMFS-6"
-        ],
-        "7.0u3→8.0": [
-            "Boot device minimum 32GB (was 8GB in 6.x)",
-            "USB/SD card boot no longer supported as of 8.0 — migrate to M.2/BOSS/SAN boot",
-            "vSphere Lifecycle Manager (vLCM) image-based management recommended over baselines",
-            "Check for deprecated drivers: some legacy NICs/HBAs removed in 8.0"
-        ],
-        "8.0u2→8.0u3": [
-            "Verify firmware compatibility with 8.0 U3 — Dell/HPE/Lenovo release async bundles",
-            "If using vLCM with Hardware Support Manager (HSM), update firmware depot first"
-        ]
-    },
-    postChecks: [
-        "Exit maintenance mode",
-        "Verify host reconnects to vCenter successfully",
-        "Check vmkernel.log for errors: tail -100 /var/log/vmkernel.log",
-        "Validate all VMkernel adapters and vMotion connectivity: vmkping",
-        "Run DRS to rebalance VMs back to upgraded host",
-        "Verify vSAN disk group health (if vSAN cluster)",
-        "Confirm esxcli software vib list shows expected version",
-        "Test vMotion to/from upgraded host"
+    "6.7u3->7.0": [
+      "WARNING: USB/SD boot devices deprecated in ESXi 7.0 - plan migration to SSD/NVMe",
+      "Verify no VMFS-5 datastores in use; upgrade to VMFS-6 first: esxcli storage vmfs upgrade",
+      "Check for legacy CIM providers that may not be compatible with ESXi 7.0",
+      "Validate network driver compatibility - e1000e replaced by native drivers in 7.0",
+      "Remove any third-party async drivers that are not signed for ESXi 7.0"
     ],
-    upgradeMethods: [
-        { method: "vLCM Image", desc: "Recommended — cluster-level image with firmware. Remediate via vCenter.", best: true },
-        { method: "vLCM Baseline", desc: "Legacy — attach baseline, scan, remediate. Being deprecated.", best: false },
-        { method: "esxcli", desc: "CLI: esxcli software profile update -d /path/to/depot.zip -p ESXi-8.0U3-standard", best: false },
-        { method: "ISO Interactive", desc: "Boot from ISO, select Upgrade. Best for single-host or lab.", best: false }
+    "7.0u3->8.0": [
+      "CRITICAL: Boot device must be at least 32GB (8GB minimum for ESXi-OSData partition)",
+      "USB/SD boot devices are NO LONGER SUPPORTED in ESXi 8.0 - must migrate to persistent storage",
+      "Check for deprecated drivers: esxcli software vib list | grep -E 'nmlx4|bnx2x|lpfc'",
+      "Verify TPM 2.0 module presence if using vSphere Trust Authority",
+      "Validate NIC driver compatibility - several inbox drivers removed in 8.0",
+      "Ensure Secure Boot is configured if enabling vSphere 8 security features"
     ],
-    estimatedDowntime: {
-        _default: "15-30 minutes per host (with rolling upgrade via DRS, zero VM downtime)",
-        single_host: "30-45 minutes (host reboot + POST + reconnect)"
-    }
+    "8.0u2->8.0u3": [
+      "Verify server firmware is on vendor-supported matrix for ESXi 8.0 U3",
+      "Check for known NIC firmware issues with i40en/ice drivers (see vendor release notes)",
+      "Validate vSAN disk group compatibility if host participates in vSAN cluster"
+    ]
+  },
+  postChecks: [
+    "Exit maintenance mode: esxcli system maintenanceMode set --enable false",
+    "Verify host reconnects to vCenter and shows Connected status",
+    "Check vmkernel.log for errors: tail -100 /var/log/vmkernel.log | grep -i error",
+    "Test vmkernel network connectivity: vmkping -I vmk0 <gateway_ip>",
+    "Monitor DRS rebalancing - VMs should migrate back within 5 minutes",
+    "Run vSAN health check if host is part of vSAN cluster",
+    "Verify installed VIBs match expected: esxcli software vib list | wc -l",
+    "Test vMotion with a small VM to validate network and compute compatibility"
+  ],
+  upgradeMethods: [
+    { method: "vLCM Image", desc: "vSphere Lifecycle Manager with a defined image (recommended for clusters)", best: true },
+    { method: "vLCM Baseline", desc: "Legacy Update Manager baseline with ESXi ISO bundle", best: false },
+    { method: "esxcli", desc: "Command-line upgrade via esxcli software profile update -d <depot.zip>", best: false },
+    { method: "ISO Interactive", desc: "Boot from ISO and select upgrade (standalone hosts or initial deployment)", best: false }
+  ],
+  estimatedDowntime: {
+    _default: "15-30 min per host",
+    single_host: "30-45 min"
+  }
 };
