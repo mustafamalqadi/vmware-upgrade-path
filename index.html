@@ -1155,9 +1155,18 @@ window.exportPDF=function(){
     win.document.write('<style>'+styles+'body{background:#fff!important;color:#111!important;padding:2rem;font-family:Inter,system-ui,sans-serif;line-height:1.7}');
     win.document.write('.step-card,.stack-order,.interop-item,.timeline-bar-container{border-color:#ddd!important;background:#fafafa!important}');
     win.document.write('.step-card::before,.badge,.order-chip,.path-node,.timeline-fill,.interop-item{print-color-adjust:exact;-webkit-print-color-adjust:exact}');
+    win.document.write('.path-node{background:#f0f1f3!important;border-color:#d0d5db!important;color:#1f2937!important}');
+    win.document.write('.path-node.current{background:#fef2f2!important;border-color:#ef4444!important;color:#dc2626!important}');
+    win.document.write('.path-node.target{background:#f0fdf4!important;border-color:#22c55e!important;color:#16a34a!important}');
+    win.document.write('.path-arrow{color:#6b7280!important}');
     win.document.write('.detail-content{display:block!important}.no-path,.known-issue{background:#fff8f8!important}.known-issue a{color:#0969da!important;font-weight:600}');
     win.document.write('.text-primary,.step-card h4,.results-header h3{color:#111!important}');
     win.document.write('.text-secondary,.step-subtitle,.detail-content li,.interop-msg{color:#444!important}');
+    win.document.write('.timeline-fill{color:#fff!important}');
+    win.document.write('.order-chip{color:#fff!important}');
+    win.document.write('.badge{color:#fff!important}');
+    win.document.write('.rollback-box{background:#fffbeb!important;border-color:#f59e0b!important;color:#92400e!important}');
+    win.document.write('.hcl-reminder{background:#eff6ff!important;border-color:#3b82f6!important;color:#1e40af!important}');
     win.document.write('.export-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #ddd}');
     win.document.write('.export-header h1{font-size:1.3rem;font-weight:700;color:#111}.export-header p{font-size:.75rem;color:#666;margin-top:.25rem}');
     win.document.write('@media print{@page{margin:1cm}}</style></head><body>');
