@@ -664,15 +664,15 @@ function getPreChecks(prod,from,to){
     // Try exact match with -> separator
     var k=from+'->'+to;
     if(prod.preChecks[k]) checks=checks.concat(prod.preChecks[k]);
-    // Fuzzy match: strip update suffixes and compare major versions
+    // Fuzzy match: normalize versions to major.minor for comparison
+    function normalize(v){return v.replace(/\.x$/,'').replace(/u\d*\w*$/,'').replace(/(\d+\.\d+)\.\d+$/,'$1');}
+    var fromN=normalize(from), toN=normalize(to);
     Object.keys(prod.preChecks).forEach(function(rk){
         if(rk==='_default'||rk===k) return;
         var parts=rk.split('->');
         if(parts.length===2){
-            var fromMaj=from.replace(/u.*$/,'').replace(/\.\d+$/,''), toMaj=to.replace(/u.*$/,'').replace(/\.\d+$/,'');
-            var rFrom=parts[0].replace(/\.x$/,'').replace(/u.*$/,'').replace(/\.\d+$/,'');
-            var rTo=parts[1].replace(/\.x$/,'').replace(/u.*$/,'').replace(/\.\d+$/,'');
-            if(fromMaj===rFrom&&toMaj===rTo) checks=checks.concat(prod.preChecks[rk]);
+            var rFromN=normalize(parts[0]), rToN=normalize(parts[1]);
+            if(fromN===rFromN&&toN===rToN) checks=checks.concat(prod.preChecks[rk]);
         }
     });
     return checks;
