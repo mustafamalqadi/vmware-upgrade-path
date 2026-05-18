@@ -36,34 +36,49 @@ const VSAN_DATA = {
   },
   preChecks: {
     _default: [
-      "CRITICAL: On-Disk Format (ODF) upgrades are ONE-WAY and cannot be rolled back",
-      "All hosts in the vSAN cluster must be at the same ESXi version before upgrading ODF",
-      "Verify vSAN health is GREEN: vSAN Cluster > Monitor > vSAN > Health",
-      "Ensure cluster has sufficient spare capacity for one host failure during rolling upgrade",
-      "Check vSAN disk group status: esxcli vsan storage list",
-      "Verify no active resync operations: esxcli vsan debug resync summary",
-      "Confirm vSAN datastore free space > 30% for safe operation during upgrade"
+      "CRITICAL: On-Disk Format (ODF) upgrades are ONE-WAY and CANNOT be rolled back — plan carefully",
+      "All ESXi hosts in the vSAN cluster MUST be at the same ESXi version before upgrading ODF",
+      "Verify vSAN health is GREEN: vSAN Cluster > Monitor > vSAN > Health — resolve ALL red/yellow items first",
+      "Ensure cluster has N+1 spare capacity — at least one host worth of capacity for maintenance mode evacuation",
+      "Check vSAN disk group status on every host: esxcli vsan storage list — all disks must show 'In Use'",
+      "Verify zero active resync operations: esxcli vsan debug resync summary — wait for 0 objects resyncing",
+      "Confirm vSAN datastore free space > 30%: Cluster > Monitor > vSAN > Capacity — needed for rebuild headroom",
+      "Verify vSAN network health: esxcli vsan network list — ensure vmkernel adapter is on correct VLAN with multicast/unicast",
+      "Test vSAN network latency between hosts: esxcli vsan debug vmknic check — latency must be < 1ms",
+      "Document current storage policy assignments: Get-SpbmStoragePolicy | Get-SpbmEntityConfiguration (PowerCLI)",
+      "Verify witness appliance version matches cluster version (for stretched/2-node clusters)",
+      "Check for decommissioned or absent disk groups: esxcli vsan storage list | grep -i 'Is SSD'"
     ],
     "6.7u3->7.0": [
-      "ODF will upgrade from 10 to 12 - this enables new features but is irreversible",
-      "Verify all disk groups are healthy: esxcli vsan debug disk list",
-      "Check witness appliance version matches cluster version requirement",
-      "Stretched cluster configurations require witness upgrade coordination"
+      "ODF will upgrade from 10 to 12 — enables native file services and improved dedup/compression, but is IRREVERSIBLE",
+      "Verify all disk groups are healthy on every host: esxcli vsan debug disk list — no errors or absent disks",
+      "Check witness appliance version matches cluster version — upgrade witness FIRST if using 2-node or stretched cluster",
+      "Stretched cluster configurations require witness upgrade coordination — upgrade witness, then preferred site, then secondary",
+      "Verify all vSAN storage policies are compatible with new ODF features",
+      "If using encryption, verify KMS connectivity and key availability: vSAN > Configure > vSAN > Encryption"
     ],
     "7.0u3->8.0": [
-      "ODF upgrade from 17 to 19 enables vSAN 8 ESA (Express Storage Architecture) option",
-      "ESA migration is optional but requires all-NVMe storage configuration",
-      "Validate HCL compatibility for vSAN 8.0 storage controllers and drives",
-      "Review vSAN Max Configuration limits changes between 7.0 and 8.0"
+      "ODF upgrade from 17 to 19 enables vSAN 8 ESA (Express Storage Architecture) option — but ESA migration is OPTIONAL",
+      "ESA requires all-NVMe storage configuration — hybrid or mixed SSD/HDD disk groups cannot use ESA",
+      "Validate HCL compatibility for vSAN 8.0 storage controllers and drives: check VMware vSAN HCL portal",
+      "Review vSAN Max Configuration limits changes between 7.0 and 8.0 (max hosts per cluster, max components, etc.)",
+      "If planning ESA migration: requires full data evacuation from OSA disk groups — plan extended maintenance window",
+      "Verify vSAN health plugin is updated in vCenter before running health checks",
+      "Check cluster advanced settings for any custom vSAN tuning that may not carry over: esxcli system settings advanced list -o /VSAN/"
     ]
   },
   postChecks: [
-    "Verify On-Disk Format version: esxcli vsan debug object health summary get",
-    "Run full vSAN health check from vSphere Client and resolve any warnings",
-    "Monitor resync operations until complete: esxcli vsan debug resync summary",
-    "Validate deduplication and compression ratios are consistent with pre-upgrade",
-    "Check vSAN datastore capacity and ensure usable capacity is as expected",
-    "Verify vSAN performance service is running and collecting metrics"
+    "Verify On-Disk Format version matches target: esxcli vsan debug object health summary get",
+    "Run full vSAN health check from vSphere Client: Cluster > Monitor > vSAN > Health — all checks must be GREEN",
+    "Monitor resync operations until 100% complete: esxcli vsan debug resync summary — do NOT start next host until done",
+    "Validate deduplication and compression ratios are consistent with pre-upgrade values: Cluster > Monitor > vSAN > Capacity",
+    "Check vSAN datastore capacity and ensure usable capacity matches expectations post-ODF upgrade",
+    "Verify vSAN performance service is running and collecting metrics: Cluster > Monitor > vSAN > Performance",
+    "Validate storage policies are still applied correctly: Get-SpbmEntityConfiguration -StoragePolicy * (PowerCLI)",
+    "Test VM provisioning: deploy a test VM on vSAN datastore and verify it powers on and writes data successfully",
+    "Verify vSAN iSCSI target service if in use: Cluster > Configure > vSAN > iSCSI Target",
+    "Check vSAN stretched cluster witness connectivity if applicable: esxcli vsan cluster get",
+    "Verify all disk groups show healthy with correct ODF version: esxcli vsan storage list"
   ],
   notes: {
     odf_warning: "On-Disk Format upgrades are ONE-WAY. Once upgraded, you cannot downgrade the ODF version. Ensure all hosts are upgraded first and a full backup exists before initiating ODF upgrade.",

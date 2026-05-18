@@ -50,52 +50,79 @@ const VCENTER_DATA = {
   },
   preChecks: {
     _default: [
-      "Verify current vCenter build number matches expected source version (vCenter Admin > Summary)",
-      "Take a file-based backup of vCenter (VAMI > Backup > Run backup now)",
-      "Take a VM-level snapshot of the vCenter Server Appliance with memory included",
-      "Verify all ESXi hosts are connected and not in maintenance mode",
-      "Confirm DNS forward and reverse resolution for VCSA FQDN from all networks",
-      "Ensure port 443, 5480, 9087 are open between VCSA and all management endpoints",
-      "Validate NTP synchronization across vCenter and all ESXi hosts (esxcli system time get)"
+      "Verify current vCenter build number matches expected source version: vCenter Admin > Summary > Build",
+      "Take a file-based backup of vCenter via VAMI (https://vcsa:5480 > Backup > Backup Now) — store on NFS/SFTP, not local",
+      "Take a VM-level snapshot of the VCSA with memory and quiesce guest FS — label it 'pre-upgrade-<version>'",
+      "Verify all ESXi hosts show Connected (not Disconnected/Not Responding) in vCenter inventory",
+      "Confirm DNS forward AND reverse resolution for VCSA FQDN from all management networks: nslookup <fqdn> && nslookup <ip>",
+      "Verify required ports are open: 443 (UI/API), 5480 (VAMI), 9087 (Analytics), 2012/2020 (vCenter HA)",
+      "Validate NTP synchronization: timedatectl on VCSA and esxcli system time get on all hosts — drift must be < 1 second",
+      "Check VCSA disk space: df -h / (root > 2GB free), df -h /storage (> 10GB free for upgrade staging)",
+      "Verify SSO domain health: /usr/lib/vmware-vmdir/bin/vdcrepadmin -f showpartnerstatus -h localhost -u admin -w <pass>",
+      "List all registered vCenter plugins and verify compatibility with target version: MOB > ExtensionManager",
+      "Validate VCSA root and admin@vsphere.local passwords are known and not expired",
+      "If using external identity source (AD/LDAP), test authentication connectivity from VCSA: ldapsearch -H ldaps://<dc>"
     ],
     "6.5u3->6.7u3": [
-      "External PSC topology must be converged to embedded before upgrading to 6.7 U3",
-      "Run the VMware Migration Assistant on the source VCSA to validate environment",
-      "Verify all plugins are compatible with vCenter 6.7 (vSAN, NSX, SRM, vROps)",
-      "Check custom TLS certificates are SHA-256; SHA-1 certs will fail post-upgrade",
-      "Validate VMware Directory Service (vmdir) replication if multi-site topology exists"
+      "External PSC topology MUST be converged to embedded before upgrading to 6.7 — use converge tool in 6.7 installer",
+      "Run VMware Migration Assistant on the source VCSA to pre-validate the environment",
+      "Verify all plugins are compatible with vCenter 6.7: vSAN, NSX, SRM, vROps, Horizon, vRA",
+      "Check custom TLS certificates use SHA-256 — SHA-1 certs will cause service startup failures post-upgrade",
+      "Validate VMware Directory Service (vmdir) replication if multi-site: vdcrepadmin -f showpartnerstatus",
+      "Document current vCenter roles and permissions — export via PowerCLI: Get-VIPermission | Export-Csv",
+      "If using vCenter HA, remove HA configuration before upgrade and reconfigure after"
     ],
     "6.7u3->7.0": [
-      "External PSC must be converged to embedded identity provider before upgrading",
-      "Run /usr/lib/vmware-vmdir/bin/vdcrepadmin to verify directory replication health",
-      "Verify ESXi hosts are at least 6.5 U2 before upgrading vCenter to 7.0",
-      "Review deprecated APIs: vSphere Web Client (Flash) removed in 7.0",
-      "Confirm Enhanced Linked Mode topology is healthy if using multiple vCenters",
-      "Backup vCenter certificates from /etc/vmware-vpx/ssl/ and /etc/vmware/ssl/"
+      "External PSC MUST be converged to embedded — the converge tool is built into vCenter 6.7 U1+",
+      "Run /usr/lib/vmware-vmdir/bin/vdcrepadmin to verify directory replication health before upgrade",
+      "Verify ESXi hosts are at least 6.5 U2 — vCenter 7.0 drops support for ESXi 6.0 and older",
+      "Review deprecated APIs: vSphere Web Client (Flash) is REMOVED in 7.0 — all automation must use REST/SOAP",
+      "Confirm Enhanced Linked Mode (ELM) topology is healthy if using multiple vCenters: check SSO domain replication",
+      "Backup vCenter certificates: scp /etc/vmware-vpx/ssl/* and /etc/vmware/ssl/* to safe location",
+      "Export all Distributed Switch configs via vSphere Client > Networking > Export Configuration",
+      "Verify VMware Tools versions on all critical VMs — upgrade to 11.x or later before vCenter upgrade",
+      "If using vSphere Replication or SRM, verify compatibility with vCenter 7.0 and plan coordinated upgrade"
     ],
     "7.0u3->8.0": [
-      "Verify all ESXi hosts are at 7.0 U2 or later (vCenter 8.0 requires this minimum)",
-      "Run VCSA Health Check from VAMI and resolve all critical/warning items",
-      "Validate vSphere Lifecycle Manager (vLCM) images if using image-based management",
-      "Check for deprecated features: vSphere Client customization specs format change",
-      "Ensure VCSA root partition has at least 10GB free (df -h /)",
-      "Verify all DRS/HA cluster configurations are valid and no orphaned objects exist"
+      "Verify all ESXi hosts are at 7.0 U2 or later — vCenter 8.0 requires minimum ESXi 7.0 U2",
+      "Run VCSA Health Check from VAMI (https://vcsa:5480 > Health) and resolve ALL critical/warning items",
+      "Validate vSphere Lifecycle Manager (vLCM) images if using image-based management — remediate any drift",
+      "Check for deprecated features: vSphere Client customization spec format changed, Content Library sync behavior updated",
+      "Ensure VCSA root partition has at least 10GB free: ssh root@vcsa 'df -h /'",
+      "Verify all DRS/HA cluster configurations are valid — fix any orphaned resource pools or invalid affinity rules",
+      "If using vSphere Trust Authority, verify Attestation Service and Key Provider configurations",
+      "Review vCenter 8.0 release notes for removed/deprecated APIs that your automation scripts may depend on",
+      "Test VCSA backup restore procedure in a lab if possible — verify backup integrity before committing to upgrade"
     ],
     "7.0u3->8.0u3": [
-      "Direct jump from 7.0 U3 to 8.0 U3 is supported but back up extensively",
-      "Run the vCenter Server 8.0 U3 pre-upgrade compatibility checker ISO first",
-      "Validate no expired or soon-to-expire certificates in Certificate Manager",
-      "Ensure VMware Directory Service database is consistent (vdcrepadmin -f showpartnerstatus)",
-      "Review release notes for all intermediate versions for any behavioral changes"
+      "Direct jump from 7.0 U3 to 8.0 U3 is supported — but take file-based backup AND snapshot as dual safety net",
+      "Run the vCenter 8.0 U3 pre-upgrade compatibility checker from the ISO mount: ./upgrade-runner.sh --precheck",
+      "Validate no expired or soon-to-expire certificates: for-each-cert certool --info --cert=/path shows expiry",
+      "Ensure VMware Directory Service database is consistent: vdcrepadmin -f showpartnerstatus -h localhost",
+      "Review release notes for ALL intermediate versions (8.0, 8.0u1, 8.0u2, 8.0u3) for behavioral changes",
+      "Verify no custom VCSA OS-level modifications (cron jobs, custom scripts in rc.local) that may break during upgrade"
     ]
   },
   postChecks: [
-    "Verify vCenter services are running: service-control --status --all",
-    "Log into vSphere Client and confirm all hosts, VMs, and clusters are visible",
-    "Validate SSO/LDAP authentication by logging in with AD-joined accounts",
-    "Check vCenter alarms and events for any post-upgrade warnings",
-    "Verify DRS, HA, and vMotion functionality with a test migration",
-    "Confirm vSphere Lifecycle Manager baselines/images are intact and accessible"
+    "Verify all vCenter services are running: service-control --status --all (expect all RUNNING)",
+    "Log into vSphere Client (https://vcsa/ui) and confirm all hosts, VMs, clusters, and datastores are visible",
+    "Validate SSO/LDAP authentication: log in with AD-joined account and verify correct role/permissions",
+    "Check vCenter alarms and events for any post-upgrade warnings: Monitor > Events > filter last 1 hour",
+    "Test DRS functionality: manually vMotion a test VM between hosts and verify completion",
+    "Test HA functionality: simulate host isolation on a test host (disconnect management NIC) and verify VM restart",
+    "Verify vMotion works: right-click VM > Migrate > Change compute resource — confirm successful migration",
+    "Confirm vSphere Lifecycle Manager baselines/images are intact: Lifecycle Manager > Imported ISOs/Baselines",
+    "Verify Content Library sync is operational if using subscribed libraries across vCenters",
+    "Check VCSA disk usage post-upgrade: df -h / — VCSA may consume more space after upgrade",
+    "Validate automated tasks: scheduled backups, DRS automation level, HA admission control",
+    "If using vCenter HA, reconfigure and verify passive/witness nodes are synchronized",
+    "Run performance test: verify vCenter UI responsiveness and API response times are comparable to pre-upgrade"
+  ],
+  upgradeMethods: [
+    { method: "GUI Installer (ISO)", desc: "Mount the VCSA ISO, run installer/vcsa-ui-installer/<os>/installer — GUI wizard walks through all steps. Best for most environments.", best: true },
+    { method: "CLI Installer (JSON)", desc: "Use vcsa-deploy with a JSON template: vcsa-deploy install/upgrade --accept-eula <template.json>. Best for automated/repeatable deployments.", best: false },
+    { method: "VAMI Update (Patch)", desc: "For minor updates only: VAMI (https://vcsa:5480) > Update > Check Updates > Stage & Install. Only for same-major patches (e.g., 8.0 U2 → 8.0 U3).", best: false },
+    { method: "VCF Lifecycle Manager", desc: "For VCF environments ONLY: SDDC Manager orchestrates vCenter upgrade as part of the BOM bundle. Do not use standalone installer.", best: false }
   ],
   knownIssues: {
     "7.0u3": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase5.html#kb-42' target='_blank'>KB #42 — vpxd Service Crash</a>: vCenter may show stale inventory after upgrade from 6.7. Resolution: Restart vpxd service and verify DB connections.",

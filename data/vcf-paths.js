@@ -42,38 +42,51 @@ const VCF_DATA = {
   },
   preChecks: {
     _default: [
-      "CRITICAL: VCF upgrades MUST be orchestrated through SDDC Manager - do NOT upgrade components individually",
-      "Run SDDC Manager pre-check: Administration > Lifecycle Management > Pre-check",
-      "Take a full file-level backup of SDDC Manager appliance",
-      "Snapshot all management domain VMs (vCenter, NSX Manager, SDDC Manager, Edge)",
-      "Verify all component passwords are valid and not expired in SDDC Manager credentials",
-      "Ensure SDDC Manager has access to the upgrade bundle depot (online or offline)",
-      "Verify NTP synchronization across all management components",
-      "Check SDDC Manager /var/log/vmware/ for any ERROR entries before starting"
+      "CRITICAL: VCF upgrades MUST be orchestrated through SDDC Manager — do NOT upgrade components (vCenter, NSX, ESXi) individually",
+      "Run SDDC Manager pre-check: Lifecycle Management > Pre-check — resolve ALL blocking items before proceeding",
+      "Take a full file-level backup of SDDC Manager appliance via SFTP: Administration > Backup",
+      "Snapshot ALL management domain VMs: SDDC Manager, vCenter, NSX Manager (x3), Edge Nodes — label 'pre-upgrade'",
+      "Verify all component passwords are valid and not expired: SDDC Manager > Security > Password Management",
+      "Ensure SDDC Manager can access upgrade bundle depot: test connectivity to depot.vmware.com or local offline depot",
+      "Verify NTP synchronization across all management components: SDDC Manager, vCenter, NSX, ESXi hosts — drift < 2 seconds",
+      "Check SDDC Manager logs for errors: ssh vcf@sddc-mgr 'grep ERROR /var/log/vmware/vcf/lcm/*.log | tail -20'",
+      "Verify SDDC Manager disk space: df -h — need at least 100GB free for download and staging of upgrade bundles",
+      "Validate all workload domain health: SDDC Manager > Inventory > Workload Domains — all must show 'Active'",
+      "Export current configuration: SDDC Manager > Developer Center > API Explorer > GET /v1/system (document current state)",
+      "Verify DNS resolution for all management components from SDDC Manager: nslookup <vcenter-fqdn>, <nsx-fqdn>"
     ],
     "4.5->5.0": [
-      "VCF 5.0 introduces vSAN ESA support - review storage architecture options",
-      "NSX will be upgraded from 3.2.x to 4.1.x as part of the bundle",
-      "Verify ESXi hosts meet 8.0 U1 hardware requirements (32GB boot device)",
-      "Review VCF 5.0 BOM for all locked component versions",
-      "Ensure all workload domain VMs have current VMware Tools installed"
+      "VCF 5.0 introduces vSAN ESA support — review storage architecture requirements if planning ESA migration",
+      "NSX will be upgraded from 3.2.x to 4.1.x as part of the VCF BOM — review NSX 4.x breaking changes (Policy-only mode)",
+      "Verify ALL ESXi hosts meet ESXi 8.0 U1 hardware requirements: 32GB boot device, supported NICs and storage controllers",
+      "Review VCF 5.0 BOM for locked component versions: vCenter 8.0 U1, ESXi 8.0 U1, NSX 4.1.0, vSAN 8.0 U1",
+      "Ensure all workload domain VMs have current VMware Tools installed — old Tools may cause compatibility warnings",
+      "Verify vRealize/Aria Suite integration compatibility if deployed: Aria Operations, Aria Automation, Aria Log Insight",
+      "MP-to-Policy promotion for NSX must be complete before VCF 5.0 upgrade — SDDC Manager will enforce this"
     ],
     "5.2->9.0": [
-      "VCF 9.0 is a major version change - requires extensive planning",
-      "Review Broadcom licensing changes applicable to VCF 9.0",
-      "Validate all third-party integrations for VCF 9.0 compatibility",
-      "Ensure SDDC Manager has minimum 100GB free disk space for upgrade bundles"
+      "VCF 9.0 is a MAJOR version change (Broadcom era) — requires extensive planning and testing in lab first",
+      "Review Broadcom licensing changes applicable to VCF 9.0 — VCF licensing model may differ from VMware era",
+      "Validate ALL third-party integrations for VCF 9.0 compatibility: backup (Veeam, Commvault), monitoring, security",
+      "Ensure SDDC Manager has minimum 100GB free disk space for VCF 9.0 upgrade bundles (bundles are larger)",
+      "Review VCF 9.0 BOM: vCenter 8.0 U3c, ESXi 8.0 U3c, NSX 4.2.1, vSAN 8.0 U3 — verify HCL for all components",
+      "Plan for extended maintenance window — VCF 9.0 upgrade includes firmware compliance checks that may require reboots",
+      "Verify Aria Suite (if deployed) compatibility with VCF 9.0 — separate upgrade path may be required"
     ]
   },
   postChecks: [
-    "Verify SDDC Manager dashboard shows all components GREEN/Healthy",
-    "Run SDDC Manager validation: Administration > Inventory > Validate All",
-    "Confirm all workload domains show Compliant status in Lifecycle Management",
-    "Verify BOM component versions match expected target in SDDC Manager inventory",
-    "Test NSX connectivity across all transport zones in each domain",
-    "Validate vSAN health for all clusters across all workload domains",
-    "Confirm backup jobs are running successfully post-upgrade",
-    "Verify SDDC Manager API accessibility: GET /v1/system/health"
+    "Verify SDDC Manager dashboard shows all components GREEN/Healthy: Inventory > Workload Domains",
+    "Run SDDC Manager full validation: Administration > Inventory > Validate All — wait for completion",
+    "Confirm all workload domains show 'Compliant' status in Lifecycle Management: LCM > Current Version matches target",
+    "Verify BOM component versions match expected target: SDDC Manager > Inventory > select domain > Components tab",
+    "Test NSX connectivity across all transport zones in each domain: verify VM-to-VM and VM-to-external traffic",
+    "Validate vSAN health for ALL clusters across all workload domains: Cluster > Monitor > vSAN > Health",
+    "Confirm backup jobs are running successfully post-upgrade: SDDC Manager backup + vCenter VAMI backup",
+    "Verify SDDC Manager API accessibility: curl -k https://sddc-mgr/v1/system/health — should return 'HEALTHY'",
+    "Test workload domain expansion: verify ability to add hosts to existing clusters (dry-run validation)",
+    "Verify credential rotation works: Security > Password Management > Rotate for a non-critical component",
+    "Check SDDC Manager upgrade history: Lifecycle Management > Upgrade History — verify all steps show 'Completed'",
+    "Validate vRealize/Aria Suite connectivity if deployed: verify dashboards and data collection are operational"
   ],
   upgradeOrder: [
     { step: 1, component: "SDDC Manager", desc: "Upgrade SDDC Manager appliance first", downtime: "15-30 min (management only)" },
