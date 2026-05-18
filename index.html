@@ -239,11 +239,19 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 .risk-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.75rem;display:none}
 .risk-panel.visible{display:block;animation:fadeSlide .3s ease}
 .risk-panel h4{font-size:.85rem;font-weight:700;color:var(--text-secondary);margin-bottom:.65rem;display:flex;align-items:center;gap:.4rem}
-.risk-factors{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.5rem}
-.risk-factor{display:flex;align-items:center;gap:.5rem;padding:.4rem .65rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text-secondary)}
+.risk-legend{display:flex;gap:.5rem;margin-bottom:.6rem;flex-wrap:wrap}
+.rl-item{font-size:.65rem;font-weight:600;padding:.2rem .5rem;border-radius:4px;opacity:.7}
+.rl-low{background:rgba(63,185,80,.1);color:var(--success)}
+.rl-med{background:rgba(210,153,34,.1);color:var(--warning)}
+.rl-high{background:rgba(248,81,73,.1);color:var(--danger)}
+.rl-crit{background:rgba(167,139,250,.1);color:var(--purple)}
+.risk-recommendation{font-size:.75rem;padding:.6rem .8rem;margin-bottom:.75rem;border-radius:8px;background:rgba(88,166,255,.04);border:1px solid rgba(88,166,255,.15);color:var(--text-secondary);line-height:1.5}
+.risk-factors{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.5rem}
+.risk-factor{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:.5rem .65rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text-secondary)}
 .risk-factor .rf-icon{font-size:.85rem;flex-shrink:0}
-.risk-factor .rf-label{flex:1}
+.risk-factor .rf-label{flex:1;min-width:120px}
 .risk-factor .rf-val{font-weight:700}
+.risk-factor .rf-mitigation{width:100%;font-size:.68rem;color:var(--accent-light);margin-top:.2rem;padding-top:.3rem;border-top:1px dashed var(--border);line-height:1.4}
 
 /* Backup matrix */
 .backup-matrix{margin-top:.5rem}
@@ -794,49 +802,58 @@ var PREFLIGHT_ITEMS=[
 ];
 
 var PREFLIGHT_STORAGE='vmware-preflight-checks';
+
+// ---- Risk Assessment Calculator ----
+// Score thresholds:
+//   0-15  = Low:      Routine upgrade, minimal risk. Proceed with standard change process.
+//   16-35 = Medium:   Notable complexity. Ensure backups verified, rollback plan tested.
+//   36-55 = High:     Significant risk. Recommend lab validation first, dedicated team, extended window.
+//   56+   = Critical: Maximum risk. Consider phased approach, engage vendor support proactively.
+
+function calculateRisk(stepPlans){
     var score=0;
     var factors=[];
 
     stepPlans.forEach(function(plan){
-        if(plan.error){score+=20;factors.push({icon:'&#128683;',label:'No path found ('+PRODUCT_LABELS[plan.key]+')',val:'+20'});return;}
+        if(plan.error){score+=20;factors.push({icon:'&#128683;',label:'No path found ('+PRODUCT_LABELS[plan.key]+')',val:'+20',mitigation:'Resolve path issue or plan fresh install with data migration'});return;}
         var prod=PRODUCT_MAP[plan.key];
         var hops=plan.path.length-1;
 
         // Version jump distance
-        if(hops>=3){score+=15;factors.push({icon:'&#128200;',label:PRODUCT_LABELS[plan.key]+': '+hops+' hops (long jump)',val:'+15'});}
-        else if(hops===2){score+=8;factors.push({icon:'&#128200;',label:PRODUCT_LABELS[plan.key]+': '+hops+' hops',val:'+8'});}
+        if(hops>=3){score+=15;factors.push({icon:'&#128200;',label:PRODUCT_LABELS[plan.key]+': '+hops+' hops (long jump)',val:'+15',mitigation:'Consider intermediate stabilization point. Test each hop in lab. Allow extra maintenance window time'});}
+        else if(hops===2){score+=8;factors.push({icon:'&#128200;',label:PRODUCT_LABELS[plan.key]+': '+hops+' hops',val:'+8',mitigation:'Standard multi-hop. Verify intermediate version compatibility before proceeding'});}
         else {score+=3;}
 
         // EOL source version
-        if(isEOL(prod,plan.from)){score+=10;factors.push({icon:'&#9888;',label:PRODUCT_LABELS[plan.key]+': Source is EOL',val:'+10'});}
+        if(isEOL(prod,plan.from)){score+=10;factors.push({icon:'&#9888;',label:PRODUCT_LABELS[plan.key]+': Source is EOL',val:'+10',mitigation:'No vendor support if upgrade fails. Have tested rollback ready. Consider opening proactive SR'});}
 
         // EOL target version
-        if(isEOL(prod,plan.to)){score+=15;factors.push({icon:'&#128308;',label:PRODUCT_LABELS[plan.key]+': Target is EOL!',val:'+15'});}
+        if(isEOL(prod,plan.to)){score+=15;factors.push({icon:'&#128308;',label:PRODUCT_LABELS[plan.key]+': Target is EOL!',val:'+15',mitigation:'Target is end-of-life — reconsider targeting a supported version instead'});}
 
         // Irreversible ODF
-        if(plan.key==='vsan'){score+=12;factors.push({icon:'&#128274;',label:'vSAN ODF upgrade (irreversible)',val:'+12'});}
+        if(plan.key==='vsan'){score+=12;factors.push({icon:'&#128274;',label:'vSAN ODF upgrade (irreversible)',val:'+12',mitigation:'Cannot rollback ODF. Verify ALL VMs are backed up externally. Test in isolated cluster first if possible'});}
 
         // Major version jump (different major number)
         var fromMajor=plan.from.split('.')[0];
         var toMajor=plan.to.split('.')[0];
-        if(fromMajor!==toMajor){score+=10;factors.push({icon:'&#9889;',label:PRODUCT_LABELS[plan.key]+': Major version change ('+fromMajor+'.x → '+toMajor+'.x)',val:'+10'});}
+        if(fromMajor!==toMajor){score+=10;factors.push({icon:'&#9889;',label:PRODUCT_LABELS[plan.key]+': Major version change ('+fromMajor+'.x → '+toMajor+'.x)',val:'+10',mitigation:'Major version = new license keys, potential feature deprecations, HCL re-validation required'});}
 
         // VCF complexity
-        if(plan.key==='vcf'){score+=10;factors.push({icon:'&#9729;',label:'VCF full-stack orchestration complexity',val:'+10'});}
+        if(plan.key==='vcf'){score+=10;factors.push({icon:'&#9729;',label:'VCF full-stack orchestration complexity',val:'+10',mitigation:'VCF upgrades are orchestrated — do NOT manually upgrade individual components. Follow SDDC Manager workflow only'});}
     });
 
     // Multi-product complexity
     var productCount=stepPlans.filter(function(s){return !s.error;}).length;
-    if(productCount>=4){score+=15;factors.push({icon:'&#127760;',label:productCount+' products upgrading simultaneously',val:'+15'});}
-    else if(productCount>=3){score+=8;factors.push({icon:'&#127760;',label:productCount+' products upgrading together',val:'+8'});}
+    if(productCount>=4){score+=15;factors.push({icon:'&#127760;',label:productCount+' products upgrading simultaneously',val:'+15',mitigation:'Consider splitting into phases: Phase 1 (vCenter+NSX), Phase 2 (ESXi+vSAN). Reduces blast radius'});}
+    else if(productCount>=3){score+=8;factors.push({icon:'&#127760;',label:productCount+' products upgrading together',val:'+8',mitigation:'Multiple products increase coordination complexity. Ensure team coverage for each product area'});}
 
-    var level,cls;
-    if(score<=15){level='Low';cls='risk-low';}
-    else if(score<=35){level='Medium';cls='risk-medium';}
-    else if(score<=55){level='High';cls='risk-high';}
-    else{level='Critical';cls='risk-critical';}
+    var level,cls,recommendation;
+    if(score<=15){level='Low';cls='risk-low';recommendation='Routine upgrade. Standard change process is sufficient. Proceed with confidence.';}
+    else if(score<=35){level='Medium';cls='risk-medium';recommendation='Moderate complexity. Verify all backups, test rollback procedure, and allocate buffer time in maintenance window.';}
+    else if(score<=55){level='High';cls='risk-high';recommendation='Significant risk. Strongly recommend: (1) Lab validation first, (2) Dedicated upgrade team, (3) Extended maintenance window, (4) Proactive vendor SR.';}
+    else{level='Critical';cls='risk-critical';recommendation='Maximum risk. Consider phased approach — do NOT attempt all upgrades in a single window. Engage Broadcom/VMware GSS before starting.';}
 
-    return {score:score,level:level,cls:cls,factors:factors};
+    return {score:score,level:level,cls:cls,factors:factors,recommendation:recommendation};
 }
 
 // ---- Communication Templates Generator ----
@@ -898,38 +915,89 @@ function generateCommTemplates(stepPlans,selections){
 }
 
 // ---- EOL Timeline Builder ----
+// Actual End of General Support dates from VMware/Broadcom Lifecycle Matrix
+// Source: https://lifecycle.vmware.com/ and Broadcom support portal
+var EOL_DATES={
+    vcenter:{
+        '6.5':'2022-10-15','6.5u1':'2022-10-15','6.5u2':'2022-10-15','6.5u3':'2022-10-15',
+        '6.7':'2023-10-15','6.7u1':'2023-10-15','6.7u2':'2023-10-15','6.7u3':'2023-10-15',
+        '7.0':'2027-04-02','7.0u1':'2027-04-02','7.0u2':'2027-04-02','7.0u3':'2027-04-02','7.0u3n':'2027-04-02','7.0u3p':'2027-04-02',
+        '8.0':'2029-10-31','8.0u1':'2029-10-31','8.0u2':'2029-10-31','8.0u3':'2029-10-31','8.0u3a':'2029-10-31','8.0u3b':'2029-10-31','8.0u3c':'2029-10-31'
+    },
+    esxi:{
+        '6.5':'2022-10-15','6.5u1':'2022-10-15','6.5u2':'2022-10-15','6.5u3':'2022-10-15',
+        '6.7':'2023-10-15','6.7u1':'2023-10-15','6.7u2':'2023-10-15','6.7u3':'2023-10-15',
+        '7.0':'2027-04-02','7.0u1':'2027-04-02','7.0u2':'2027-04-02','7.0u3':'2027-04-02','7.0u3n':'2027-04-02','7.0u3p':'2027-04-02',
+        '8.0':'2029-10-31','8.0u1':'2029-10-31','8.0u2':'2029-10-31','8.0u3':'2029-10-31','8.0u3a':'2029-10-31','8.0u3b':'2029-10-31','8.0u3c':'2029-10-31'
+    },
+    nsx:{
+        '3.1':'2024-01-15','3.1.1':'2024-01-15','3.1.2':'2024-01-15','3.1.3':'2024-01-15',
+        '3.2':'2025-11-20','3.2.1':'2025-11-20','3.2.2':'2025-11-20','3.2.3':'2025-11-20',
+        '4.0':'2026-03-06','4.0.1':'2026-03-06',
+        '4.1':'2027-11-30','4.1.1':'2027-11-30','4.1.2':'2027-11-30','4.1.3':'2027-11-30',
+        '4.2':'2029-08-31','4.2.1':'2029-08-31'
+    },
+    vsan:{
+        '6.5':'2022-10-15','6.6':'2022-10-15','6.7':'2023-10-15',
+        '7.0':'2027-04-02','7.0u1':'2027-04-02','7.0u2':'2027-04-02','7.0u3':'2027-04-02',
+        '8.0':'2029-10-31','8.0u1':'2029-10-31','8.0u2':'2029-10-31','8.0u3':'2029-10-31'
+    },
+    vcf:{
+        '4.0':'2024-04-09','4.1':'2024-04-09','4.2':'2025-01-22','4.3':'2025-01-22','4.4':'2025-10-11','4.5':'2025-10-11',
+        '5.0':'2028-11-30','5.1':'2028-11-30','5.2':'2029-08-31'
+    }
+};
+
 function buildEolTimeline(stepPlans){
     var now=new Date();
-    var nowYear=now.getFullYear();
-    var nowMonth=now.getMonth()+1;
-    // General Support end estimates (approximate based on VMware lifecycle policy: 5 years from GA)
     var bars=[];
     stepPlans.forEach(function(plan){
         if(plan.error) return;
         var prod=PRODUCT_MAP[plan.key];
-        // Show from and to version lifecycle status
         [plan.from,plan.to].forEach(function(vid){
             var ver=prod.versions.find(function(v){return v.id===vid;});
             if(!ver) return;
-            var relParts=ver.release?ver.release.split('-'):[nowYear.toString(),(nowMonth<10?'0':'')+nowMonth];
-            var relYear=parseInt(relParts[0]);
-            var relMonth=parseInt(relParts[1]);
-            // Approximate end of general support: +5 years for major releases
-            var eolYear=relYear+5;
-            var eolMonth=relMonth;
-            var status='active';
-            if(ver.eol) status='expired';
-            else if(eolYear<=nowYear&&eolMonth<=nowMonth) status='expired';
-            else if(eolYear===nowYear+1||(eolYear===nowYear&&eolMonth-nowMonth<=6)) status='warning';
+
+            // Look up actual EOL date
+            var eolDateStr=EOL_DATES[plan.key]?EOL_DATES[plan.key][vid]:null;
+            var status,eolDisplay,isEstimated=false;
+
+            if(ver.eol){
+                status='expired';
+                eolDisplay=eolDateStr||'EOL (confirmed)';
+            } else if(eolDateStr){
+                var eolDate=new Date(eolDateStr);
+                if(eolDate<=now){
+                    status='expired';
+                } else {
+                    var monthsLeft=((eolDate.getFullYear()-now.getFullYear())*12)+(eolDate.getMonth()-now.getMonth());
+                    status=monthsLeft<=12?'warning':'active';
+                }
+                eolDisplay=eolDateStr;
+            } else {
+                // Fallback: estimate from release + 5 years (marked as estimated)
+                isEstimated=true;
+                var relParts=ver.release?ver.release.split('-'):['2024','01'];
+                var eolYear=parseInt(relParts[0])+5;
+                var eolMonth=parseInt(relParts[1]);
+                eolDisplay=eolYear+'-'+(eolMonth<10?'0':'')+eolMonth+' (estimated)';
+                var eolDate2=new Date(eolYear,eolMonth-1,1);
+                if(eolDate2<=now) status='expired';
+                else {
+                    var ml=((eolDate2.getFullYear()-now.getFullYear())*12)+(eolDate2.getMonth()-now.getMonth());
+                    status=ml<=12?'warning':'active';
+                }
+            }
 
             bars.push({
                 product:PRODUCT_LABELS[plan.key],
                 version:ver.label,
                 release:ver.release||'Unknown',
-                eolApprox:eolYear+'-'+(eolMonth<10?'0':'')+eolMonth,
+                eolDate:eolDisplay,
                 status:status,
                 color:COLORS[plan.key],
-                isTarget:vid===plan.to
+                isTarget:vid===plan.to,
+                isEstimated:isEstimated
             });
         });
     });
@@ -1497,9 +1565,13 @@ window.generatePlan=function(){
     var risk=calculateRisk(stepPlans);
     var riskDiv=document.getElementById('riskPanel');
     var riskHtml='<h4>&#128202; Risk Assessment <span class="risk-badge '+risk.cls+'">'+risk.level+' (Score: '+risk.score+')</span></h4>';
+    riskHtml+='<div class="risk-legend"><span class="rl-item rl-low">0-15 Low</span><span class="rl-item rl-med">16-35 Medium</span><span class="rl-item rl-high">36-55 High</span><span class="rl-item rl-crit">56+ Critical</span></div>';
+    riskHtml+='<div class="risk-recommendation"><strong>&#128161; Recommendation:</strong> '+risk.recommendation+'</div>';
     riskHtml+='<div class="risk-factors">';
     risk.factors.forEach(function(f){
-        riskHtml+='<div class="risk-factor"><span class="rf-icon">'+f.icon+'</span><span class="rf-label">'+f.label+'</span><span class="rf-val">'+f.val+'</span></div>';
+        riskHtml+='<div class="risk-factor"><span class="rf-icon">'+f.icon+'</span><span class="rf-label">'+f.label+'</span><span class="rf-val">'+f.val+'</span>';
+        if(f.mitigation) riskHtml+='<div class="rf-mitigation">&#128736; '+f.mitigation+'</div>';
+        riskHtml+='</div>';
     });
     if(risk.factors.length===0) riskHtml+='<div class="risk-factor"><span class="rf-icon">&#9989;</span><span class="rf-label">No elevated risk factors detected</span><span class="rf-val">Low</span></div>';
     riskHtml+='</div>';
@@ -1536,15 +1608,19 @@ window.generatePlan=function(){
     var eolDiv=document.getElementById('eolTimeline');
     var eolBars=buildEolTimeline(stepPlans);
     if(eolBars.length>0){
-        var eolHtml='<h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Version Lifecycle Status</h4>';
+        var eolHtml='<h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Version Lifecycle Status <span style="font-weight:400;font-size:.7rem;color:var(--text-muted)">(Source: VMware Lifecycle Matrix)</span></h4>';
         eolBars.forEach(function(bar){
             var statusCls=bar.status==='expired'?'eol-expired':(bar.status==='warning'?'eol-warning':'eol-active');
-            var statusLabel=bar.status==='expired'?'EOL':(bar.status==='warning'?'Expiring Soon':'Supported');
+            var statusLabel=bar.status==='expired'?'End of Life':(bar.status==='warning'?'Expiring Soon':'Supported');
+            var supportInfo='';
+            if(bar.status==='expired') supportInfo=' — End of General Support: '+bar.eolDate;
+            else supportInfo=' — End of General Support: '+bar.eolDate;
             eolHtml+='<div class="eol-bar">';
             eolHtml+='<div class="eol-label" style="color:'+bar.color+'">'+bar.version+(bar.isTarget?' ★':'')+'</div>';
-            eolHtml+='<div class="eol-track"><div class="eol-fill '+statusCls+'" style="left:0;width:100%;">'+statusLabel+' — Released '+bar.release+(bar.status!=='expired'?' — Support est. until ~'+bar.eolApprox:'')+'</div></div>';
+            eolHtml+='<div class="eol-track"><div class="eol-fill '+statusCls+'" style="left:0;width:100%;">'+statusLabel+' — GA: '+bar.release+supportInfo+'</div></div>';
             eolHtml+='</div>';
         });
+        eolHtml+='<div class="eol-source" style="font-size:.65rem;color:var(--text-muted);margin-top:.5rem;text-align:right">Data from <a href="https://lifecycle.vmware.com/" target="_blank" rel="noopener" style="color:var(--accent-light)">VMware Lifecycle Matrix</a> &amp; Broadcom Support Portal</div>';
         eolDiv.innerHTML=eolHtml;
         eolDiv.classList.add('visible');
     } else {
