@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VMware Upgrade Path Planner — calculate the correct upgrade sequence for vCenter, ESXi, vSAN, and NSX across your full stack. Pre-checks, known issues, and rollback guidance.">
+    <meta property="og:title" content="VMware Upgrade Path Planner — Full Stack Sequencer">
+    <meta property="og:description" content="Interactive tool to plan VMware infrastructure upgrades. Calculates multi-product upgrade order, intermediate hops, pre-checks, and estimated downtime.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mustafamalqadi.github.io/vmware-upgrade-path/">
+    <meta name="theme-color" content="#0d1117">
+    <title>VMware Upgrade Path Planner — Full Stack Sequencer</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 22L16 6l8 16' stroke='%2358a6ff' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11 16h10' stroke='%233fb950' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #1c2128;
+            --bg-card-hover: #262c34;
+            --accent: #58a6ff;
+            --accent-light: #79c0ff;
+            --success: #3fb950;
+            --success-light: #56d364;
+            --danger: #f85149;
+            --danger-light: #ff7b72;
+            --warning: #d29922;
+            --warning-light: #e3b341;
+            --purple: #a78bfa;
+            --purple-light: #c4b5fd;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border: #30363d;
+            --shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.7; min-height: 100vh; }
+
+        /* Header */
+        .header { background: linear-gradient(180deg, #0d1117 0%, #111820 100%); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+        .header h1 { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
+        .header h1 span { font-weight: 400; color: var(--text-secondary); }
+        .header-badge { padding: 0.3rem 0.85rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; background: rgba(88,166,255,0.1); color: var(--accent-light); border: 1px solid rgba(88,166,255,0.25); }
+        .header-links { display: flex; gap: 1rem; align-items: center; }
+        .header-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: color .15s; }
+        .header-links a:hover { color: var(--accent-light); }
+
+        /* Main container */
+        .container { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+        /* Hero */
+        .hero { text-align: center; margin-bottom: 3rem; }
+        .hero h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.3px; }
+        .hero p { color: var(--text-secondary); font-size: 0.95rem; max-width: 620px; margin: 0 auto; }
+
+        /* Stack selector */
+        .stack-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: border-color .2s, transform .2s; }
+        .product-card:hover { border-color: rgba(88,166,255,0.3); }
+        .product-card.active { border-color: var(--accent); box-shadow: 0 0 20px rgba(88,166,255,0.1); }
+        .product-card .pc-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .product-card .pc-icon { font-size: 1.4rem; }
+        .product-card .pc-name { font-size: 1rem; font-weight: 700; }
+        .product-card .pc-order { margin-left: auto; width: 24px; height: 24px; border-radius: 50%; background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: var(--accent-light); opacity: 0; transition: opacity .2s; }
+        .product-card.active .pc-order { opacity: 1; }
+        .version-row { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.6rem; }
+        .version-row label { font-size: 0.78rem; color: var(--text-secondary); min-width: 52px; font-weight: 500; }
+        .version-row select { flex: 1; padding: 0.5rem 0.75rem; border-radius: 8px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); font-size: 0.82rem; font-family: inherit; outline: none; cursor: pointer; transition: border-color .15s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e7681' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem; }
+        .version-row select:focus { border-color: var(--accent); }
+        .version-row select option { background: var(--bg-secondary); color: var(--text-primary); }
+
+        /* Generate button */
+        .generate-section { text-align: center; margin-bottom: 3rem; }
+        .btn-generate { padding: 0.85rem 2.5rem; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #2f81f7); border: none; color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform .15s, box-shadow .15s; box-shadow: 0 4px 20px rgba(88,166,255,0.25); }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(88,166,255,0.35); }
+        .btn-generate:active { transform: translateY(0); }
+        .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Results */
+        .results { display: none; }
+        .results.visible { display: block; animation: fadeSlide 0.4s ease; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .results-header h3 { font-size: 1.3rem; font-weight: 700; }
+        .results-header .badge-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .badge { padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+        .badge-steps { background: rgba(88,166,255,0.1); color: var(--accent-light); border: 1px solid rgba(88,166,255,0.2); }
+        .badge-downtime { background: rgba(210,153,34,0.1); color: var(--warning-light); border: 1px solid rgba(210,153,34,0.2); }
+
+        /* Stack order notice */
+        .stack-order { background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+        .stack-order h4 { font-size: 0.85rem; font-weight: 700; color: var(--warning-light); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .stack-order .order-flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.85rem; }
+        .order-chip { padding: 0.35rem 0.85rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
+        .order-arrow { color: var(--text-muted); font-size: 1rem; }
+
+        /* Step cards */
+        .step-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; position: relative; overflow: hidden; }
+        .step-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+        .step-card.step-vcenter::before { background: #58a6ff; }
+        .step-card.step-nsx::before { background: #a78bfa; }
+        .step-card.step-esxi::before { background: #3fb950; }
+        .step-card.step-vsan::before { background: #d29922; }
+        .step-num { position: absolute; top: 1rem; right: 1.25rem; width: 28px; height: 28px; border-radius: 50%; background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: var(--accent-light); }
+        .step-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.15rem; display: flex; align-items: center; gap: 0.5rem; }
+        .step-card .step-subtitle { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem; }
+        .step-card .step-path { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; font-size: 0.82rem; }
+        .step-card .path-node { padding: 0.25rem 0.6rem; border-radius: 5px; background: var(--bg-secondary); border: 1px solid var(--border); font-weight: 500; white-space: nowrap; }
+        .step-card .path-node.current { border-color: var(--danger); color: var(--danger-light); background: rgba(248,81,73,0.06); }
+        .step-card .path-node.target { border-color: var(--success); color: var(--success-light); background: rgba(63,185,80,0.06); }
+        .step-card .path-arrow { color: var(--text-muted); }
+
+        /* Collapsible sections */
+        .step-details { margin-top: 0.75rem; }
+        .detail-toggle { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0; color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; cursor: pointer; border: none; background: none; font-family: inherit; transition: color .15s; }
+        .detail-toggle:hover { color: var(--accent-light); }
+        .detail-toggle svg { transition: transform .2s; }
+        .detail-toggle.open svg { transform: rotate(90deg); }
+        .detail-content { display: none; padding: 0.75rem 0 0 0.5rem; }
+        .detail-content.open { display: block; animation: fadeSlide 0.25s ease; }
+        .detail-content ul { list-style: none; padding: 0; }
+        .detail-content li { position: relative; padding: 0.3rem 0 0.3rem 1.25rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; }
+        .detail-content li::before { content: ''; position: absolute; left: 0; top: 0.7rem; width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+        .detail-content li.warn::before { background: var(--warning); }
+        .detail-content li.critical::before { background: var(--danger); }
+        .detail-content .known-issue { padding: 0.6rem 1rem; border-radius: 8px; background: rgba(248,81,73,0.05); border: 1px solid rgba(248,81,73,0.15); font-size: 0.78rem; color: var(--danger-light); margin-top: 0.5rem; }
+
+        /* No path warning */
+        .no-path { text-align: center; padding: 2.5rem 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; }
+        .no-path .np-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.6; }
+        .no-path h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--danger-light); }
+        .no-path p { font-size: 0.88rem; color: var(--text-secondary); max-width: 450px; margin: 0 auto; }
+
+        /* Footer */
+        .footer { border-top: 1px solid var(--border); margin-top: 4rem; padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.78rem; }
+        .footer a { color: var(--text-secondary); text-decoration: none; transition: color .15s; }
+        .footer a:hover { color: var(--accent); }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .header-inner { flex-direction: column; align-items: flex-start; }
+            .stack-selector { grid-template-columns: 1fr; }
+            .container { padding: 1.5rem 1rem 3rem; }
+            .hero h2 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <h1>&#9650; Upgrade Path <span>Planner</span></h1>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+            <span class="header-badge">4 Products</span>
+            <div class="header-links">
+                <a href="https://mustafamalqadi.github.io/vmware-kbs/">KB Portal</a>
+                <a href="https://mustafamalqadi.github.io/">Home</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="hero">
+        <h2>VMware Full Stack Upgrade Planner</h2>
+        <p>Select your current and target versions for each product. The planner calculates the correct upgrade sequence, intermediate hops, and pre-checks.</p>
+    </div>
+
+    <!-- Product version selectors -->
+    <div class="stack-selector" id="stackSelector">
+        <!-- Populated by JS -->
+    </div>
+
+    <div class="generate-section">
+        <button class="btn-generate" id="btnGenerate" onclick="generatePlan()">Generate Upgrade Plan</button>
+    </div>
+
+    <!-- Results -->
+    <div class="results" id="results"></div>
+</div>
+
+<footer class="footer">
+    <p>VMware Upgrade Path Planner — Full Stack Sequencer</p>
+    <p><a href="https://mustafamalqadi.github.io/vmware-kbs/">&larr; Knowledge Bases</a> &nbsp;|&nbsp; <a href="https://mustafamalqadi.github.io/">Portal</a></p>
+    <p>&copy; 2026 Eng. Mustafa Al-Qadi</p>
+</footer>
+
+<script src="data/vcenter-paths.js"></script>
+<script src="data/esxi-paths.js"></script>
+<script src="data/vsan-paths.js"></script>
+<script src="data/nsx-paths.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    const ALL_PRODUCTS = [VCENTER_DATA, ESXI_DATA, VSAN_DATA, NSX_DATA];
+
+    /**
+     * The CORRECT upgrade order for VMware stack:
+     * 1. vCenter (must be ≥ ESXi version)
+     * 2. NSX Manager + Edge (before host transport node VIBs with ESXi)
+     * 3. ESXi hosts (rolling)
+     * 4. vSAN on-disk format (only after ALL hosts upgraded)
+     */
+    const UPGRADE_ORDER = ['vcenter', 'nsx', 'esxi', 'vsan'];
+    const PRODUCT_MAP = { vcenter: VCENTER_DATA, esxi: ESXI_DATA, vsan: VSAN_DATA, nsx: NSX_DATA };
+    const PRODUCT_LABELS = { vcenter: 'vCenter', nsx: 'NSX', esxi: 'ESXi', vsan: 'vSAN ODF' };
+    const STEP_CLASSES = { vcenter: 'step-vcenter', nsx: 'step-nsx', esxi: 'step-esxi', vsan: 'step-vsan' };
+
+    // Build UI
+    function buildSelectors() {
+        var container = document.getElementById('stackSelector');
+        ALL_PRODUCTS.forEach(function(prod, idx) {
+            var key = Object.keys(PRODUCT_MAP).find(function(k) { return PRODUCT_MAP[k] === prod; });
+            var card = document.createElement('div');
+            card.className = 'product-card';
+            card.id = 'card-' + key;
+            card.innerHTML =
+                '<div class="pc-header">' +
+                    '<span class="pc-icon">' + prod.icon + '</span>' +
+                    '<span class="pc-name">' + prod.product + '</span>' +
+                    '<span class="pc-order">' + (UPGRADE_ORDER.indexOf(key) + 1) + '</span>' +
+                '</div>' +
+                '<div class="version-row"><label>From</label><select id="from-' + key + '" onchange="cardChanged(\'' + key + '\')"><option value="">— Skip —</option>' +
+                    prod.versions.map(function(v) { return '<option value="' + v.id + '">' + v.label + (v.eol ? ' (EOL)' : '') + '</option>'; }).join('') +
+                '</select></div>' +
+                '<div class="version-row"><label>To</label><select id="to-' + key + '" onchange="cardChanged(\'' + key + '\')"><option value="">— Skip —</option>' +
+                    prod.versions.map(function(v) { return '<option value="' + v.id + '">' + v.label + (v.eol ? ' (EOL)' : '') + '</option>'; }).join('') +
+                '</select></div>';
+            container.appendChild(card);
+        });
+    }
+
+    window.cardChanged = function(key) {
+        var from = document.getElementById('from-' + key).value;
+        var to = document.getElementById('to-' + key).value;
+        var card = document.getElementById('card-' + key);
+        if (from && to && from !== to) {
+            card.classList.add('active');
+        } else {
+            card.classList.remove('active');
+        }
+    };
+
+    /**
+     * BFS shortest path through the version graph
+     */
+    function findPath(graph, start, end) {
+        if (start === end) return [start];
+        if (!graph[start]) return null;
+        var queue = [[start]];
+        var visited = {};
+        visited[start] = true;
+        while (queue.length > 0) {
+            var path = queue.shift();
+            var node = path[path.length - 1];
+            var neighbors = graph[node] || [];
+            for (var i = 0; i < neighbors.length; i++) {
+                var next = neighbors[i];
+                if (next === end) return path.concat([next]);
+                if (!visited[next]) {
+                    visited[next] = true;
+                    queue.push(path.concat([next]));
+                }
+            }
+        }
+        return null; // no path
+    }
+
+    function getVersionLabel(prod, id) {
+        var v = prod.versions.find(function(x) { return x.id === id; });
+        return v ? v.label : id;
+    }
+
+    function getPreChecks(prod, from, to) {
+        var checks = (prod.preChecks._default || []).slice();
+        var key = from + '→' + to;
+        if (prod.preChecks[key]) {
+            checks = checks.concat(prod.preChecks[key]);
+        }
+        // Try partial matches (e.g., major version transitions)
+        Object.keys(prod.preChecks).forEach(function(k) {
+            if (k === '_default' || k === key) return;
+            var parts = k.split('→');
+            if (parts.length === 2) {
+                if (from.startsWith(parts[0].replace(/u\d+$/, '')) && to.startsWith(parts[1].replace(/u\d+$/, '')) && k !== key) {
+                    // Major version match
+                    var majorFrom = parts[0].split('.')[0] + '.' + parts[0].split('.')[1];
+                    var majorTo = parts[1].split('.')[0] + '.' + parts[1].split('.')[1];
+                    var curMajorFrom = from.split('u')[0];
+                    var curMajorTo = to.split('u')[0];
+                    if (majorFrom === curMajorFrom && majorTo === curMajorTo) {
+                        checks = checks.concat(prod.preChecks[k]);
+                    }
+                }
+            }
+        });
+        return checks;
+    }
+
+    window.generatePlan = function() {
+        var selections = {};
+        var hasAny = false;
+
+        UPGRADE_ORDER.forEach(function(key) {
+            var from = document.getElementById('from-' + key).value;
+            var to = document.getElementById('to-' + key).value;
+            if (from && to && from !== to) {
+                selections[key] = { from: from, to: to };
+                hasAny = true;
+            }
+        });
+
+        if (!hasAny) {
+            alert('Please select at least one product with different From and To versions.');
+            return;
+        }
+
+        var resultsDiv = document.getElementById('results');
+        var html = '';
+        var totalSteps = 0;
+        var stepPlans = [];
+        var hasError = false;
+
+        // Process in correct upgrade order
+        UPGRADE_ORDER.forEach(function(key) {
+            if (!selections[key]) return;
+            var prod = PRODUCT_MAP[key];
+            var sel = selections[key];
+            var path = findPath(prod.paths, sel.from, sel.to);
+
+            if (!path) {
+                hasError = true;
+                stepPlans.push({ key: key, error: true, from: sel.from, to: sel.to });
+            } else {
+                totalSteps++;
+                stepPlans.push({ key: key, error: false, path: path, from: sel.from, to: sel.to });
+            }
+        });
+
+        // Stack order notice
+        var activeProducts = stepPlans.filter(function(s) { return !s.error; }).map(function(s) { return s.key; });
+        if (activeProducts.length > 1) {
+            html += '<div class="stack-order"><h4>&#9888;&#65039; Correct Upgrade Order</h4><div class="order-flow">';
+            activeProducts.forEach(function(key, idx) {
+                var color = PRODUCT_MAP[key].color;
+                html += '<span class="order-chip" style="background:' + color + '15;color:' + color + ';border:1px solid ' + color + '40;">' + PRODUCT_LABELS[key] + '</span>';
+                if (idx < activeProducts.length - 1) html += '<span class="order-arrow">&#8594;</span>';
+            });
+            html += '</div></div>';
+        }
+
+        // Results header
+        html += '<div class="results-header"><h3>Upgrade Plan</h3><div class="badge-row">' +
+            '<span class="badge badge-steps">' + totalSteps + ' Product' + (totalSteps > 1 ? 's' : '') + '</span>' +
+            '<span class="badge badge-downtime">' + (stepPlans.reduce(function(acc, s) { return acc + (s.path ? s.path.length - 1 : 0); }, 0)) + ' Version Hops</span>' +
+            '</div></div>';
+
+        // Step cards
+        var stepNum = 0;
+        stepPlans.forEach(function(plan) {
+            var prod = PRODUCT_MAP[plan.key];
+
+            if (plan.error) {
+                html += '<div class="no-path"><div class="np-icon">&#128683;</div>' +
+                    '<h4>No Supported Path: ' + prod.product + '</h4>' +
+                    '<p>No direct or multi-hop upgrade path from <strong>' + getVersionLabel(prod, plan.from) + '</strong> to <strong>' + getVersionLabel(prod, plan.to) + '</strong>. A fresh install may be required.</p></div>';
+                return;
+            }
+
+            stepNum++;
+            var hops = plan.path.length - 1;
+            var preChecks = getPreChecks(prod, plan.from, plan.to);
+            var postChecks = prod.postChecks || [];
+            var knownIssue = prod.knownIssues ? prod.knownIssues[plan.to] || prod.knownIssues[plan.to.split('u')[0]] : null;
+            var downtime = prod.estimatedDowntime ? prod.estimatedDowntime._default : 'N/A';
+
+            html += '<div class="step-card ' + STEP_CLASSES[plan.key] + '">';
+            html += '<span class="step-num">' + stepNum + '</span>';
+            html += '<h4><span>' + prod.icon + '</span> ' + prod.product + '</h4>';
+            html += '<div class="step-subtitle">' + getVersionLabel(prod, plan.from) + ' → ' + getVersionLabel(prod, plan.to) + ' &nbsp;(' + hops + ' hop' + (hops > 1 ? 's' : '') + ', ~' + downtime + ')</div>';
+
+            // Path visualization
+            html += '<div class="step-path">';
+            plan.path.forEach(function(nodeId, idx) {
+                var cls = idx === 0 ? 'current' : (idx === plan.path.length - 1 ? 'target' : '');
+                html += '<span class="path-node ' + cls + '">' + getVersionLabel(prod, nodeId) + '</span>';
+                if (idx < plan.path.length - 1) html += '<span class="path-arrow">→</span>';
+            });
+            html += '</div>';
+
+            // Pre-checks collapsible
+            var preId = 'pre-' + plan.key;
+            html += '<div class="step-details">';
+            html += '<button class="detail-toggle" onclick="toggleDetail(\'' + preId + '\', this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg> Pre-Checks (' + preChecks.length + ')</button>';
+            html += '<div class="detail-content" id="' + preId + '"><ul>';
+            preChecks.forEach(function(c) {
+                var cls = c.toLowerCase().includes('critical') ? 'critical' : (c.toLowerCase().includes('must') || c.toLowerCase().includes('before') ? 'warn' : '');
+                html += '<li class="' + cls + '">' + c + '</li>';
+            });
+            html += '</ul></div>';
+
+            // Post-checks collapsible
+            var postId = 'post-' + plan.key;
+            html += '<button class="detail-toggle" onclick="toggleDetail(\'' + postId + '\', this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg> Post-Checks (' + postChecks.length + ')</button>';
+            html += '<div class="detail-content" id="' + postId + '"><ul>';
+            postChecks.forEach(function(c) { html += '<li>' + c + '</li>'; });
+            html += '</ul></div>';
+
+            // Known issues
+            if (knownIssue) {
+                html += '<div class="detail-content open"><div class="known-issue">&#9888;&#65039; <strong>Known Issue:</strong> ' + knownIssue + '</div></div>';
+            }
+
+            // Upgrade methods (ESXi only)
+            if (prod.upgradeMethods) {
+                var methId = 'meth-' + plan.key;
+                html += '<button class="detail-toggle" onclick="toggleDetail(\'' + methId + '\', this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg> Upgrade Methods</button>';
+                html += '<div class="detail-content" id="' + methId + '"><ul>';
+                prod.upgradeMethods.forEach(function(m) {
+                    html += '<li' + (m.best ? ' class="warn"' : '') + '><strong>' + m.method + '</strong> — ' + m.desc + (m.best ? ' ✓ Recommended' : '') + '</li>';
+                });
+                html += '</ul></div>';
+            }
+
+            // NSX upgrade order
+            if (prod.upgradeOrder) {
+                var ordId = 'ord-' + plan.key;
+                html += '<button class="detail-toggle" onclick="toggleDetail(\'' + ordId + '\', this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg> Component Order</button>';
+                html += '<div class="detail-content" id="' + ordId + '"><ul>';
+                prod.upgradeOrder.forEach(function(o) {
+                    html += '<li class="warn"><strong>Step ' + o.step + ': ' + o.component + '</strong> — ' + o.desc + ' (Downtime: ' + o.downtime + ')</li>';
+                });
+                html += '</ul></div>';
+            }
+
+            html += '</div>'; // step-details
+            html += '</div>'; // step-card
+        });
+
+        resultsDiv.innerHTML = html;
+        resultsDiv.classList.add('visible');
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.toggleDetail = function(id, btn) {
+        var el = document.getElementById(id);
+        el.classList.toggle('open');
+        btn.classList.toggle('open');
+    };
+
+    // Init
+    buildSelectors();
+})();
+</script>
+</body>
+</html>
