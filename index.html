@@ -349,8 +349,44 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
     .saved-plans-panel{min-width:280px;left:0;transform:none}
 }
 @media(max-width:480px){.stack-selector{grid-template-columns:1fr}}
+/* Pre-flight Checklist */
+.preflight-panel{margin:1rem 0;padding:1.25rem 1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;display:none}
+.preflight-panel.visible{display:block}
+.preflight-panel h4{font-size:.9rem;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.preflight-progress{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.preflight-bar{flex:1;height:6px;background:var(--bg-secondary);border-radius:4px;overflow:hidden}
+.preflight-fill{height:100%;background:var(--success);border-radius:4px;transition:width .3s}
+.preflight-pct{font-size:.72rem;font-weight:600;color:var(--text-secondary);min-width:3rem;text-align:right}
+.preflight-items{display:flex;flex-direction:column;gap:.35rem}
+.preflight-item{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .6rem;border-radius:6px;font-size:.78rem;cursor:pointer;transition:background .15s}
+.preflight-item:hover{background:var(--bg-card-hover)}
+.preflight-item input[type="checkbox"]{margin-top:2px;accent-color:var(--success);cursor:pointer}
+.preflight-item.checked{opacity:.6;text-decoration:line-through}
+.preflight-item .pf-label{flex:1}
+.preflight-reset{margin-top:.75rem;font-size:.7rem;color:var(--text-muted);background:none;border:1px solid var(--border);border-radius:6px;padding:.3rem .7rem;cursor:pointer;transition:all .15s}
+.preflight-reset:hover{color:var(--danger);border-color:var(--danger)}
+
+/* License Warning */
+.license-warning{margin:.75rem 0;padding:.75rem 1rem;border-radius:8px;border:1px solid rgba(210,153,34,.3);background:rgba(210,153,34,.05);font-size:.78rem}
+.license-warning h5{font-size:.8rem;font-weight:700;color:var(--warning-light);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
+.license-warning ul{margin:0;padding-left:1.2rem;color:var(--text-secondary)}
+.license-warning li{margin:.2rem 0}
+
+/* Capacity Validation */
+.capacity-tips{margin:.75rem 0;padding:.75rem 1rem;border-radius:8px;border:1px solid rgba(88,166,255,.2);background:rgba(88,166,255,.04);font-size:.78rem}
+.capacity-tips h5{font-size:.8rem;font-weight:700;color:var(--accent-light);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
+.capacity-tips ul{margin:0;padding-left:1.2rem;color:var(--text-secondary)}
+.capacity-tips li{margin:.2rem 0}
+.capacity-tips .cap-ok{color:var(--success)}
+.capacity-tips .cap-warn{color:var(--warning-light)}
+
+/* Documentation Links */
+.docs-links{margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.4rem}
+.docs-links a{font-size:.7rem;padding:.2rem .6rem;border-radius:5px;background:rgba(88,166,255,.08);color:var(--accent-light);border:1px solid rgba(88,166,255,.15);text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:.25rem}
+.docs-links a:hover{background:rgba(88,166,255,.15);border-color:rgba(88,166,255,.3)}
+
 @media print{
-    .header,.action-bar,.scroll-progress,.footer,.hero,.stack-selector,.toast,.saved-plans-panel{display:none!important}
+    .header,.action-bar,.scroll-progress,.footer,.hero,.stack-selector,.toast,.saved-plans-panel,.preflight-panel{display:none!important}
     .results,.timeline-section,.interop-panel,.stack-order{break-inside:avoid}
     .detail-content{display:block!important}
     body{background:#fff;color:#111}
@@ -405,6 +441,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
             <div class="hero-stat"><div class="num">120+</div><div class="lbl">Paths</div></div>
             <div class="hero-stat"><div class="num">7</div><div class="lbl">Interop Rules</div></div>
             <div class="hero-stat"><div class="num">5</div><div class="lbl">Risk Factors</div></div>
+            <div class="hero-stat"><div class="num">12</div><div class="lbl">Pre-flight Checks</div></div>
         </div>
     </div>
 
@@ -442,6 +479,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
     <div class="risk-panel" id="riskPanel"></div>
     <div class="upgrade-sequence" id="upgradeSequence"></div>
     <div class="eol-timeline" id="eolTimeline"></div>
+    <div class="preflight-panel" id="preflightPanel"></div>
     <div class="maint-calc" id="maintCalc">
         <h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Maintenance Window Calculator</h4>
         <div class="maint-calc-grid">
@@ -642,8 +680,120 @@ var BACKUP_MATRIX={
 // ---- HCL URL ----
 var HCL_URL='https://www.vmware.com/resources/compatibility/search.php';
 
-// ---- Risk Assessment Calculator ----
-function calculateRisk(stepPlans){
+// ---- Documentation Links per product/version ----
+var DOC_LINKS={
+    vcenter:{
+        base:'https://docs.vmware.com/en/VMware-vSphere/',
+        releaseNotes:{
+            '7.0':'7.0/rn/vsphere-vcenter-server-70-release-notes.html',
+            '7.0u1':'7.0/rn/vsphere-vcenter-server-70u1-release-notes.html',
+            '7.0u2':'7.0/rn/vsphere-vcenter-server-70u2-release-notes.html',
+            '7.0u3':'7.0/rn/vsphere-vcenter-server-70u3-release-notes.html',
+            '8.0':'8.0/rn/vsphere-vcenter-server-80-release-notes.html',
+            '8.0u1':'8.0/rn/vsphere-vcenter-server-80u1-release-notes.html',
+            '8.0u2':'8.0/rn/vsphere-vcenter-server-80u2-release-notes.html',
+            '8.0u3':'8.0/rn/vsphere-vcenter-server-80u3-release-notes.html'
+        },
+        upgradeGuide:'https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-vcenter-upgrade/GUID-30485437-B107-42EC-A0A8-A03334CFC825.html'
+    },
+    esxi:{
+        base:'https://docs.vmware.com/en/VMware-vSphere/',
+        releaseNotes:{
+            '7.0':'7.0/rn/vsphere-esxi-70-release-notes.html',
+            '7.0u1':'7.0/rn/vsphere-esxi-70u1-release-notes.html',
+            '7.0u2':'7.0/rn/vsphere-esxi-70u2-release-notes.html',
+            '7.0u3':'7.0/rn/vsphere-esxi-70u3-release-notes.html',
+            '8.0':'8.0/rn/vsphere-esxi-80-release-notes.html',
+            '8.0u1':'8.0/rn/vsphere-esxi-80u1-release-notes.html',
+            '8.0u2':'8.0/rn/vsphere-esxi-80u2-release-notes.html',
+            '8.0u3':'8.0/rn/vsphere-esxi-80u3-release-notes.html'
+        },
+        upgradeGuide:'https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-upgrade/GUID-FE668788-1F21-4B4B-99EB-C):undefined'
+    },
+    nsx:{
+        base:'https://docs.vmware.com/en/VMware-NSX/',
+        releaseNotes:{
+            '3.2':'3.2/rn/vmware-nsx-t-data-center-32-release-notes/index.html',
+            '4.0':'4.0/rn/vmware-nsx-40-release-notes/index.html',
+            '4.1':'4.1/rn/vmware-nsx-41-release-notes/index.html',
+            '4.2':'4.2/rn/vmware-nsx-42-release-notes/index.html'
+        },
+        upgradeGuide:'https://docs.vmware.com/en/VMware-NSX/4.2/upgrade/GUID-E04242D7-EF09-4443-B0AE-3C6E1C4F38B5.html'
+    },
+    vsan:{
+        base:'https://docs.vmware.com/en/VMware-vSAN/',
+        releaseNotes:{
+            '7.0':'7.0/rn/vmware-vsan-70-release-notes.html',
+            '8.0':'8.0/rn/vmware-vsan-80-release-notes.html'
+        },
+        upgradeGuide:'https://docs.vmware.com/en/VMware-vSAN/8.0/vsan-upgrade/GUID-CE384032-144D-4DDE-8D58-B3B5C6E3C43E.html'
+    },
+    vcf:{
+        base:'https://docs.vmware.com/en/VMware-Cloud-Foundation/',
+        releaseNotes:{
+            '4.5':'4.5/rn/vmware-cloud-foundation-45-release-notes/index.html',
+            '5.0':'5.0/rn/vmware-cloud-foundation-50-release-notes/index.html',
+            '5.1':'5.1/rn/vmware-cloud-foundation-51-release-notes/index.html',
+            '5.2':'5.2/rn/vmware-cloud-foundation-52-release-notes/index.html'
+        },
+        upgradeGuide:'https://docs.vmware.com/en/VMware-Cloud-Foundation/5.2/vcf-upgrade/GUID-3FFB7E81-75D1-4FA3-BED3-A8B0C6859169.html'
+    }
+};
+
+// ---- License Compatibility Rules ----
+var LICENSE_RULES=[
+    {from:'6',to:'7',msg:'vSphere 6.x → 7.x: Existing vSphere 6 license keys are NOT valid for vSphere 7. You need new vSphere 7 license keys. Contact your VMware rep or license portal.'},
+    {from:'7',to:'8',msg:'vSphere 7.x → 8.x: vSphere 7 license keys are NOT valid for vSphere 8. New keys required. Check if your Broadcom subscription includes vSphere 8 entitlement.'},
+    {from:'6',to:'8',msg:'vSphere 6.x → 8.x: Complete license replacement required. Two major-version jump — verify contract covers vSphere 8 under new Broadcom licensing model.'}
+];
+
+// ---- Cluster Capacity Validation ----
+var CAPACITY_RULES={
+    esxi:[
+        {check:'Minimum hosts for vSAN',condition:'If vSAN is enabled, cluster must have ≥3 hosts (≥4 recommended for FTT=1 rebuild)',icon:'&#128421;'},
+        {check:'DRS evacuation headroom',condition:'At least 1 host worth of spare capacity must exist for DRS to evacuate VMs during rolling upgrade',icon:'&#128260;'},
+        {check:'HA admission control',condition:'Verify HA admission control policy allows N-1 host failure. Upgrade puts hosts in maintenance = effectively reduces capacity',icon:'&#128737;'},
+        {check:'Swap/memory overcommit',condition:'If memory overcommit >150%, upgrade may fail to evacuate VMs — reduce load or add hosts first',icon:'&#128200;'}
+    ],
+    vcenter:[
+        {check:'VCSA sizing',condition:'Upgrading to vCenter 8.x requires: Tiny(2vCPU/14GB), Small(4vCPU/21GB), Medium(8vCPU/30GB), Large(16vCPU/48GB). Verify target meets requirements',icon:'&#128187;'},
+        {check:'Embedded PSC migration',condition:'External PSC is not supported in 7.0+. If upgrading from 6.7 with external PSC, converge to embedded first',icon:'&#9889;'},
+        {check:'Database partition',condition:'Verify /storage/db has ≥10GB free. Large environments (>500 VMs) may need expanded disk before upgrade',icon:'&#128451;'}
+    ],
+    nsx:[
+        {check:'Edge cluster redundancy',condition:'Ensure Edge Cluster has ≥2 Edge nodes. Upgrade is sequential — one Edge is always active during rolling upgrade',icon:'&#128260;'},
+        {check:'Transport node connectivity',condition:'All transport nodes must show "Success" for Configuration State. Fix any "Failed" or "In Progress" states before upgrade',icon:'&#128279;'},
+        {check:'DFW rule count',condition:'Environments with >5000 DFW rules: validate backup export size and allow extra time for Manager upgrade (database migration)',icon:'&#128220;'}
+    ],
+    vsan:[
+        {check:'Disk group health',condition:'All disk groups must be HEALTHY. Run: vSAN Health > Hardware Compatibility > Disk health. Replace any degraded disks before upgrade',icon:'&#128440;'},
+        {check:'Objects to resync',condition:'Resyncing objects = 0 required. Check vSAN Health > Data > Active Resync. Wait for completion before upgrade',icon:'&#128260;'},
+        {check:'Capacity utilization',condition:'vSAN datastore must be <80% utilized. During upgrade, maintenance mode moves data — needs slack space for rebalancing',icon:'&#128202;'}
+    ],
+    vcf:[
+        {check:'SDDC Manager health',condition:'Administration > Inventory > Validate All must show green. Resolve all warnings before VCF upgrade bundle download',icon:'&#127919;'},
+        {check:'Bundle compatibility',condition:'Download correct VCF upgrade bundle from Broadcom portal. Bundle versions must match exact target — partial bundles will fail',icon:'&#128230;'},
+        {check:'Workload domain state',condition:'All workload domains must show "ACTIVE" status. Domains in "ERROR" or "ACTIVATING" state block upgrade',icon:'&#128203;'}
+    ]
+};
+
+// ---- Pre-flight Checklist Items (universal) ----
+var PREFLIGHT_ITEMS=[
+    {id:'pf-backup-verified',label:'All backups verified and accessible (file-based + snapshots)',critical:true},
+    {id:'pf-snapshot-taken',label:'VM snapshots taken for all management appliances',critical:true},
+    {id:'pf-dns-tested',label:'DNS forward and reverse resolution verified for all components',critical:true},
+    {id:'pf-ntp-synced',label:'NTP synchronized across all components (max 1s skew)',critical:false},
+    {id:'pf-hcl-checked',label:'Hardware Compatibility List verified for target versions',critical:false},
+    {id:'pf-disk-space',label:'Sufficient disk space confirmed on all upgrade targets',critical:true},
+    {id:'pf-licenses-ready',label:'New license keys obtained (if major version change)',critical:false},
+    {id:'pf-change-approved',label:'Change request approved and maintenance window confirmed',critical:true},
+    {id:'pf-team-notified',label:'Stakeholders notified (pre-upgrade communication sent)',critical:false},
+    {id:'pf-rollback-documented',label:'Rollback procedures reviewed and understood by team',critical:true},
+    {id:'pf-gss-case',label:'Proactive VMware GSS/Broadcom support case opened (optional)',critical:false},
+    {id:'pf-interop-confirmed',label:'Interoperability matrix validated for all product combinations',critical:true}
+];
+
+var PREFLIGHT_STORAGE='vmware-preflight-checks';
     var score=0;
     var factors=[];
 
@@ -784,6 +934,104 @@ function buildEolTimeline(stepPlans){
         });
     });
     return bars;
+}
+
+// ---- License Compatibility Check ----
+function checkLicenseImpact(stepPlans){
+    var warnings=[];
+    stepPlans.forEach(function(plan){
+        if(plan.error) return;
+        if(plan.key==='vcenter'||plan.key==='esxi'){
+            var fromMajor=plan.from.charAt(0);
+            var toMajor=plan.to.charAt(0);
+            if(fromMajor!==toMajor){
+                LICENSE_RULES.forEach(function(rule){
+                    if(rule.from===fromMajor&&rule.to===toMajor){
+                        warnings.push(rule.msg);
+                    }
+                });
+            }
+        }
+        if(plan.key==='nsx'){
+            var fromNsx=plan.from.split('.')[0];
+            var toNsx=plan.to.split('.')[0];
+            if(fromNsx!==toNsx) warnings.push('NSX '+fromNsx+'.x → '+toNsx+'.x: New NSX license keys required. NSX-T/NSX 4.x licenses differ from NSX-T 3.x. Verify Broadcom entitlement.');
+        }
+    });
+    return warnings;
+}
+
+// ---- Capacity Validation Tips Generator ----
+function getCapacityTips(stepPlans){
+    var tips=[];
+    stepPlans.forEach(function(plan){
+        if(plan.error) return;
+        var rules=CAPACITY_RULES[plan.key];
+        if(rules){
+            rules.forEach(function(r){
+                tips.push({product:PRODUCT_LABELS[plan.key],icon:r.icon,check:r.check,condition:r.condition,key:plan.key});
+            });
+        }
+    });
+    return tips;
+}
+
+// ---- Documentation Links Generator ----
+function getDocLinks(plan){
+    var links=[];
+    var docs=DOC_LINKS[plan.key];
+    if(!docs) return links;
+    // Find release notes for target version
+    var toBase=plan.to.replace(/[a-z]$/,'');// strip trailing letter (8.0u3a -> 8.0u3)
+    var toMajor=plan.to.match(/^\d+\.\d+/);
+    toMajor=toMajor?toMajor[0]:'';
+    // Try exact, then base, then major
+    var rn=docs.releaseNotes[plan.to]||docs.releaseNotes[toBase]||docs.releaseNotes[toMajor];
+    if(rn) links.push({label:'Release Notes',url:docs.base+rn});
+    if(docs.upgradeGuide) links.push({label:'Upgrade Guide',url:docs.upgradeGuide});
+    return links;
+}
+
+// ---- Pre-flight Checklist Functions ----
+function getPreflightState(){
+    try{var s=localStorage.getItem(PREFLIGHT_STORAGE);return s?JSON.parse(s):{};}catch(e){return {};}
+}
+function savePreflightState(state){
+    try{localStorage.setItem(PREFLIGHT_STORAGE,JSON.stringify(state));}catch(e){}
+}
+
+window.togglePreflightItem=function(id){
+    var state=getPreflightState();
+    state[id]=!state[id];
+    savePreflightState(state);
+    renderPreflight();
+};
+
+window.resetPreflight=function(){
+    localStorage.removeItem(PREFLIGHT_STORAGE);
+    renderPreflight();
+};
+
+function renderPreflight(){
+    var panel=document.getElementById('preflightPanel');
+    if(!panel.classList.contains('visible')) return;
+    var state=getPreflightState();
+    var checked=0;
+    PREFLIGHT_ITEMS.forEach(function(item){if(state[item.id]) checked++;});
+    var pct=Math.round((checked/PREFLIGHT_ITEMS.length)*100);
+    var html='<h4>&#9989; Pre-flight Checklist <span style="font-weight:400;font-size:.75rem;color:var(--text-secondary)">('+checked+'/'+PREFLIGHT_ITEMS.length+')</span></h4>';
+    html+='<div class="preflight-progress"><div class="preflight-bar"><div class="preflight-fill" style="width:'+pct+'%"></div></div><span class="preflight-pct">'+pct+'%</span></div>';
+    html+='<div class="preflight-items">';
+    PREFLIGHT_ITEMS.forEach(function(item){
+        var isChecked=state[item.id]||false;
+        html+='<label class="preflight-item'+(isChecked?' checked':'')+'">';
+        html+='<input type="checkbox" '+(isChecked?'checked':'')+' onchange="togglePreflightItem(\''+item.id+'\')">';
+        html+='<span class="pf-label">'+(item.critical?'<strong>[CRITICAL]</strong> ':'')+item.label+'</span>';
+        html+='</label>';
+    });
+    html+='</div>';
+    html+='<button class="preflight-reset" onclick="resetPreflight()">Reset Checklist</button>';
+    panel.innerHTML=html;
 }
 
 // ---- Maintenance Window Calculator ----
@@ -1303,11 +1551,30 @@ window.generatePlan=function(){
         eolDiv.classList.remove('visible');
     }
 
+    // Pre-flight Checklist
+    var pfPanel=document.getElementById('preflightPanel');
+    pfPanel.classList.add('visible');
+    renderPreflight();
+
+    // License Compatibility Warnings
+    var licWarnings=checkLicenseImpact(stepPlans);
+
+    // Capacity Validation Tips
+    var capTips=getCapacityTips(stepPlans);
+
     html+='<div class="results-header"><h3>&#128203; Upgrade Plan <span class="risk-badge '+risk.cls+'">Risk: '+risk.level+'</span></h3><div class="badge-row">'+
         '<span class="badge badge-accent">'+totalSteps+' Product'+(totalSteps>1?'s':'')+'</span>'+
         '<span class="badge badge-warning">'+totalHops+' Version Hop'+(totalHops>1?'s':'')+'</span>'+
         '<span class="badge badge-success">'+(warnings.length===0?'No Warnings':warnings.length+' Warning'+(warnings.length>1?'s':''))+'</span>'+
     '</div></div>';
+
+    // License warnings (plan-level)
+    if(licWarnings.length>0){
+        html+='<div class="license-warning"><h5>&#128273; License Compatibility Impact</h5><ul>';
+        licWarnings.forEach(function(w){html+='<li>'+w+'</li>';});
+        html+='</ul></div>';
+    }
+
     html+='<div class="expand-all-row"><button class="expand-all-btn" onclick="toggleAllDetails(this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg> Expand All</button></div>';
 
     var stepNum=0;
@@ -1412,6 +1679,28 @@ window.generatePlan=function(){
 
         // HCL reminder for ESXi
         if(plan.key==='esxi') html+='<div class="hcl-reminder">&#128187; <strong>HCL Check:</strong> Verify server model + ESXi '+getLabel(prod,plan.to)+' on the <a href="'+HCL_URL+'" target="_blank" rel="noopener">VMware HCL</a> before upgrading. Check IO devices, storage controllers, and NICs.</div>';
+
+        // Documentation Links
+        var docLinks=getDocLinks(plan);
+        if(docLinks.length>0){
+            html+='<div class="docs-links">';
+            docLinks.forEach(function(dl){
+                html+='<a href="'+dl.url+'" target="_blank" rel="noopener"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> '+dl.label+'</a>';
+            });
+            html+='</div>';
+        }
+
+        // Capacity Validation (per-product)
+        var prodCapTips=capTips.filter(function(t){return t.key===plan.key;});
+        if(prodCapTips.length>0){
+            var capId='cap-'+plan.key;
+            html+='<button class="detail-toggle" onclick="toggleDetail(\''+capId+'\',this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>Capacity Validation ('+prodCapTips.length+')</button>';
+            html+='<div class="detail-content" id="'+capId+'"><div class="capacity-tips"><h5>&#128202; Capacity & Resource Checks</h5><ul>';
+            prodCapTips.forEach(function(t){
+                html+='<li>'+t.icon+' <strong>'+t.check+':</strong> '+t.condition+'</li>';
+            });
+            html+='</ul></div></div>';
+        }
 
         html+='</div></div>';
     });
@@ -1556,6 +1845,8 @@ window.resetAll=function(){
     document.getElementById('upgradeSequence').classList.remove('visible');
     document.getElementById('eolTimeline').innerHTML='';
     document.getElementById('eolTimeline').classList.remove('visible');
+    document.getElementById('preflightPanel').innerHTML='';
+    document.getElementById('preflightPanel').classList.remove('visible');
     document.getElementById('timelineSection').classList.remove('visible');
     document.getElementById('btnExport').style.display='none';
     document.getElementById('btnCopyLink').style.display='none';
