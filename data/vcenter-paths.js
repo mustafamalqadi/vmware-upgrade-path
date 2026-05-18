@@ -98,11 +98,11 @@ const VCENTER_DATA = {
     "Confirm vSphere Lifecycle Manager baselines/images are intact and accessible"
   ],
   knownIssues: {
-    "7.0u3": "KB 89VMW-001: vCenter may show stale inventory after upgrade from 6.7. Resolution: Restart vpxd service.",
-    "8.0": "KB 90VMW-002: Custom SSL certificates may revert to VMCA-signed during upgrade. Re-apply custom certs post-upgrade.",
-    "8.0u1": "KB 91VMW-003: LDAPS connections may fail if intermediate CA certificates are not in the trusted store.",
-    "8.0u2": "KB 92VMW-004: vLCM image compliance checks may report false negatives after upgrade. Run remediation scan.",
-    "8.0u3": "KB 93VMW-005: vCenter HA failover may take longer than expected on first failover post-upgrade. Reconfigure vCenter HA."
+    "7.0u3": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase5.html#kb-42' target='_blank'>KB #42 — vpxd Service Crash</a>: vCenter may show stale inventory after upgrade from 6.7. Resolution: Restart vpxd service and verify DB connections.",
+    "8.0": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase2.html#kb-11' target='_blank'>KB #11 — Certificate Expiry &amp; STS Token</a>: Custom SSL certificates may revert to VMCA-signed during upgrade. Re-apply custom certs post-upgrade.",
+    "8.0u1": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase2.html#kb-16' target='_blank'>KB #16 — SSO / AD Integration</a>: LDAPS connections may fail if intermediate CA certificates are not in the trusted store.",
+    "8.0u2": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase8.html#kb-75' target='_blank'>KB #75 — vLCM Image-Based Updates</a>: vLCM image compliance checks may report false negatives after upgrade. Run remediation scan.",
+    "8.0u3": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase5.html#kb-49' target='_blank'>KB #49 — vCenter HA Failover</a>: vCenter HA failover may take longer than expected on first failover post-upgrade. Reconfigure vCenter HA."
   },
   estimatedDowntime: {
     _default: "30-60 minutes",

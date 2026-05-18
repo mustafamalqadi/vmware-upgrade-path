@@ -97,5 +97,10 @@ const VCF_DATA = {
     _default: "2-6 hours per domain",
     management_domain: "3-5 hours total",
     workload_domain: "2-4 hours per domain"
+  },
+  knownIssues: {
+    "5.0": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase2.html#kb-12' target='_blank'>KB #12 — ESXi Patch / Upgrade</a>: SDDC Manager pre-check may fail if management cluster hosts have stale vLCM baselines. Refresh before upgrade.",
+    "5.1": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase5.html#kb-42' target='_blank'>KB #42 — vpxd Service Issues</a>: Management domain vCenter may show brief inventory loss during BOM upgrade. Wait for auto-recovery.",
+    "9.0": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase2.html#kb-11' target='_blank'>KB #11 — Certificate Expiry</a>: VCF 9.0 upgrade requires valid certificates across all components. Renew any expiring certs before starting the upgrade workflow."
   }
 };

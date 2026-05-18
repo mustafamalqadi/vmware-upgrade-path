@@ -76,6 +76,10 @@ const NSX_DATA = {
     { step: 2, component: "Edge Nodes", desc: "Upgrade Edge Nodes in each Edge Cluster (one at a time with failover)", downtime: "2-5 seconds per Edge failover event" },
     { step: 3, component: "Host Transport Nodes", desc: "Upgrade NSX VIBs on all ESXi hosts (can be done per cluster)", downtime: "No data-plane downtime if using rolling upgrade" }
   ],
+  knownIssues: {
+    "4.0": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase2.html#kb-17' target='_blank'>KB #17 — NTP / Time Drift</a>: NSX Manager nodes may fail to form cluster if time skew exceeds 5 seconds after upgrade. Verify NTP sync across all nodes.",
+    "4.1": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase2.html#kb-11' target='_blank'>KB #11 — Certificate Issues</a>: Edge Node certificates may expire during extended upgrade windows. Renew certs before starting if expiry is within 30 days."
+  },
   estimatedDowntime: {
     _default: "Near-zero (rolling upgrade with failover)",
     edge_failover: "2-5 seconds per Edge Node failover",

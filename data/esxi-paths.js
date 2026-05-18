@@ -96,6 +96,11 @@ const ESXI_DATA = {
     { method: "esxcli", desc: "Command-line upgrade via esxcli software profile update -d <depot.zip>", best: false },
     { method: "ISO Interactive", desc: "Boot from ISO and select upgrade (standalone hosts or initial deployment)", best: false }
   ],
+  knownIssues: {
+    "7.0": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase2.html#kb-12' target='_blank'>KB #12 — ESXi Patch / Upgrade with vLCM</a>: Remediation may fail if depot metadata is corrupted or host has incompatible async drivers.",
+    "8.0": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase2.html#kb-15' target='_blank'>KB #15 — SSH / Shell &amp; Hardening</a>: After ESXi 8.0 upgrade, SSH may be disabled by default due to stricter lockdown profile. Re-enable if needed.",
+    "8.0u3": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsphere-kb/phase8.html#kb-75' target='_blank'>KB #75 — vLCM Image-Based Updates</a>: Hardware Support Manager (HSM) firmware add-ons may fail compliance after update to 8.0 U3."
+  },
   estimatedDowntime: {
     _default: "15-30 min per host",
     single_host: "30-45 min"

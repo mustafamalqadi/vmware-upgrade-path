@@ -70,6 +70,11 @@ const VSAN_DATA = {
     esa_note: "vSAN 8.0 Express Storage Architecture (ESA) is a new storage architecture that requires all-NVMe and is not compatible with hybrid or mixed disk groups. Migration from OSA to ESA requires data evacuation.",
     rolling: "vSAN upgrades are performed as a rolling upgrade. Each host enters maintenance mode, is upgraded, then exits. VMs remain running on other hosts. Ensure N+1 capacity."
   },
+  knownIssues: {
+    "7.0u3": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsan-kb/phase1.html#kb-9' target='_blank'>KB #9 — On-Disk Format Upgrade</a>: ODF upgrade pre-check may fail if stale objects exist. Run repair before upgrading.",
+    "8.0": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsan-kb/phase1.html#kb-10' target='_blank'>KB #10 — Maintenance Mode Stuck</a>: Hosts may hang entering maintenance mode if resync backlog is high. Ensure full data evacuation can complete.",
+    "8.0u2": "<a href='https://mustafamalqadi.github.io/vmware-kbs/vsan-kb/phase2.html#kb-11' target='_blank'>KB #11 — ESA Storage Pool</a>: ESA pool creation may fail on mixed-generation NVMe drives. Validate HCL before migration."
+  },
   estimatedDowntime: {
     _default: "Zero VM downtime (rolling upgrade)",
     odf_upgrade: "5-10 min (metadata operation)",
