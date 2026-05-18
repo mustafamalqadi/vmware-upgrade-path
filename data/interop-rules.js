@@ -104,9 +104,11 @@ const INTEROP_RULES = {
     var results = [];
     var self = this;
     self.rules.forEach(function(rule) {
-      var fromVal = selections[rule.from];
-      var toVal = selections[rule.to];
-      if (fromVal && toVal) {
+      var fromSel = selections[rule.from];
+      var toSel = selections[rule.to];
+      if (fromSel && toSel) {
+        var fromVal = fromSel.to;
+        var toVal = toSel.to;
         var passed = rule.check(fromVal, toVal);
         if (!passed) {
           results.push({

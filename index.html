@@ -661,15 +661,18 @@ function isEOL(prod,id){var v=prod.versions.find(function(x){return x.id===id;})
 
 function getPreChecks(prod,from,to){
     var checks=(prod.preChecks._default||[]).slice();
-    var k=from+'\u2192'+to;
+    // Try exact match with -> separator
+    var k=from+'->'+to;
     if(prod.preChecks[k]) checks=checks.concat(prod.preChecks[k]);
+    // Fuzzy match: strip update suffixes and compare major versions
     Object.keys(prod.preChecks).forEach(function(rk){
         if(rk==='_default'||rk===k) return;
-        var parts=rk.split('\u2192');
+        var parts=rk.split('->');
         if(parts.length===2){
-            var fromMaj=from.replace(/u.*$/,''), toMaj=to.replace(/u.*$/,'');
-            var rFromMaj=parts[0].replace(/u.*$/,''), rToMaj=parts[1].replace(/u.*$/,'');
-            if(fromMaj===rFromMaj&&toMaj===rToMaj) checks=checks.concat(prod.preChecks[rk]);
+            var fromMaj=from.replace(/u.*$/,'').replace(/\.\d+$/,''), toMaj=to.replace(/u.*$/,'').replace(/\.\d+$/,'');
+            var rFrom=parts[0].replace(/\.x$/,'').replace(/u.*$/,'').replace(/\.\d+$/,'');
+            var rTo=parts[1].replace(/\.x$/,'').replace(/u.*$/,'').replace(/\.\d+$/,'');
+            if(fromMaj===rFrom&&toMaj===rTo) checks=checks.concat(prod.preChecks[rk]);
         }
     });
     return checks;
@@ -958,7 +961,7 @@ window.generatePlan=function(){
         var hops=plan.path.length-1;
         var preChecks=getPreChecks(prod,plan.from,plan.to);
         var postChecks=prod.postChecks||[];
-        var ki=prod.knownIssues?prod.knownIssues[plan.to]||prod.knownIssues[plan.to.split('u')[0]]:null;
+        var ki=prod.knownIssues?(prod.knownIssues[plan.to]||prod.knownIssues[plan.to.split('u')[0]]||prod.knownIssues[plan.to.replace(/\.\d+$/,'')]):null;
         var dt=prod.estimatedDowntime?prod.estimatedDowntime._default:'N/A';
         var targetEol=isEOL(prod,plan.to);
 
