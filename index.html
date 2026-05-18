@@ -192,11 +192,14 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 }
 @media(max-width:480px){.stack-selector{grid-template-columns:1fr}}
 @media print{
-    .header,.action-bar,.scroll-progress,.footer{display:none!important}
+    .header,.action-bar,.scroll-progress,.footer,.hero,.stack-selector{display:none!important}
     .results,.timeline-section,.interop-panel,.stack-order{break-inside:avoid}
     .detail-content{display:block!important}
     body{background:#fff;color:#111}
+    .container{padding:0;max-width:100%}
     .step-card,.stack-order,.interop-item,.timeline-bar-container{border-color:#ddd;background:#fafafa}
+    .step-card::before{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+    .badge,.order-chip,.path-node{print-color-adjust:exact;-webkit-print-color-adjust:exact}
 }
     </style>
 </head>
@@ -592,8 +595,30 @@ window.resetAll=function(){
 };
 
 window.exportPDF=function(){
-    // Open print dialog — CSS @media print handles layout
-    window.print();
+    var interop=document.getElementById('interopPanel').innerHTML;
+    var results=document.getElementById('results').innerHTML;
+    var timeline=document.getElementById('timelineSection').innerHTML;
+    if(!results){alert('Generate a plan first.');return;}
+    var win=window.open('','_blank');
+    var styles=document.querySelector('style').textContent;
+    win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Upgrade Plan Export</title>');
+    win.document.write('<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">');
+    win.document.write('<style>'+styles+'body{background:#fff!important;color:#111!important;padding:2rem;font-family:Inter,system-ui,sans-serif;line-height:1.7}');
+    win.document.write('.step-card,.stack-order,.interop-item,.timeline-bar-container{border-color:#ddd!important;background:#fafafa!important}');
+    win.document.write('.step-card::before,.badge,.order-chip,.path-node,.timeline-fill,.interop-item{print-color-adjust:exact;-webkit-print-color-adjust:exact}');
+    win.document.write('.detail-content{display:block!important}.no-path,.known-issue{background:#fff8f8!important}');
+    win.document.write('.text-primary,.step-card h4,.results-header h3{color:#111!important}');
+    win.document.write('.text-secondary,.step-subtitle,.detail-content li,.interop-msg{color:#444!important}');
+    win.document.write('.export-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #ddd}');
+    win.document.write('.export-header h1{font-size:1.3rem;font-weight:700;color:#111}.export-header p{font-size:.75rem;color:#666;margin-top:.25rem}');
+    win.document.write('@media print{@page{margin:1cm}}</style></head><body>');
+    win.document.write('<div class="export-header"><h1>VMware Upgrade Plan</h1><p>Generated '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})+' \u2014 mustafamalqadi.github.io/vmware-upgrade-path</p></div>');
+    if(interop) win.document.write('<div class="interop-panel visible">'+interop+'</div>');
+    win.document.write('<div class="results visible">'+results+'</div>');
+    if(timeline) win.document.write('<div class="timeline-section visible">'+timeline+'</div>');
+    win.document.write('</body></html>');
+    win.document.close();
+    setTimeout(function(){win.print();},400);
 };
 
 buildSelectors();
