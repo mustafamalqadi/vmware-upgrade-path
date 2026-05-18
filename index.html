@@ -207,6 +207,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 .detail-content li.warn::before{background:var(--warning)}
 .detail-content li.critical::before{background:var(--danger)}
 .detail-content li code{background:var(--bg-secondary);padding:.1rem .4rem;border-radius:4px;font-size:.72rem;color:var(--accent-light);border:1px solid var(--border)}
+.method-desc{color:var(--text-muted);font-size:.73rem;display:block;margin:.2rem 0 .3rem 0;line-height:1.5}
+.method-badge{display:inline-block;background:rgba(63,185,80,.12);color:var(--success-light);font-size:.65rem;font-weight:700;padding:.1rem .45rem;border-radius:4px;margin-left:.4rem;vertical-align:middle}
+.method-steps{list-style:decimal!important;padding-left:1.5rem!important;margin:.3rem 0 .6rem 0;border-left:2px solid var(--border);padding-top:.2rem;padding-bottom:.2rem}
+.method-steps li{padding:.15rem 0 .15rem .3rem!important;font-size:.72rem!important;color:var(--text-muted)!important}
+.method-steps li::before{display:none!important}
 .known-issue{padding:.55rem .9rem;border-radius:8px;background:rgba(248,81,73,.04);border:1px solid rgba(248,81,73,.12);font-size:.75rem;color:var(--danger-light);margin-top:.4rem;line-height:1.6}
 .known-issue a{color:var(--accent-light);font-weight:600;text-decoration:underline;text-decoration-color:rgba(88,166,255,.3);transition:text-decoration-color .15s}
 .known-issue a:hover{text-decoration-color:var(--accent-light)}
@@ -996,12 +1001,20 @@ window.generatePlan=function(){
         postChecks.forEach(function(c){html+='<li>'+c+'</li>';});
         html+='</ul></div>';
 
-        // Upgrade methods (ESXi)
+        // Upgrade methods
         if(prod.upgradeMethods){
             var mid='meth-'+plan.key;
-            html+='<button class="detail-toggle" onclick="toggleDetail(\''+mid+'\',this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>Upgrade Methods</button>';
+            html+='<button class="detail-toggle" onclick="toggleDetail(\''+mid+'\',this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>Upgrade Methods ('+prod.upgradeMethods.length+')</button>';
             html+='<div class="detail-content" id="'+mid+'"><ul>';
-            prod.upgradeMethods.forEach(function(m){html+='<li'+(m.best?' class="warn"':'')+'><strong>'+m.method+'</strong> \u2014 '+m.desc+(m.best?' \u2713 Recommended':'')+'</li>';});
+            prod.upgradeMethods.forEach(function(m){
+                html+='<li'+(m.best?' class="warn"':'')+'><strong>'+m.method+'</strong>'+(m.best?' <span class="method-badge">\u2713 Recommended</span>':'')+'<br><span class="method-desc">'+m.desc+'</span>';
+                if(m.steps){
+                    html+='<ol class="method-steps">';
+                    m.steps.split(' | ').forEach(function(s){html+='<li>'+s.replace(/^\d+\)\s*/,'')+'</li>';});
+                    html+='</ol>';
+                }
+                html+='</li>';
+            });
             html+='</ul></div>';
         }
 
