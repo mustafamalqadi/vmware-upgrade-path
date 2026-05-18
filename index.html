@@ -225,6 +225,64 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
 /* Rollback guidance */
 .rollback-box{padding:.65rem 1rem;border-radius:8px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.15);font-size:.75rem;color:var(--purple-light);margin-top:.5rem;line-height:1.6}
 .rollback-box strong{color:var(--purple-light)}
+.rollback-steps{list-style:none;padding:0;margin:.4rem 0 0 0}
+.rollback-steps li{padding:.2rem 0 .2rem 1rem;font-size:.72rem;color:var(--text-secondary);position:relative;line-height:1.5}
+.rollback-steps li::before{content:'\21A9';position:absolute;left:0;color:var(--purple)}
+.rollback-rto{margin-top:.3rem;font-size:.68rem;font-weight:600;color:var(--purple);opacity:.8}
+
+/* Risk assessment */
+.risk-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:6px;font-size:.7rem;font-weight:700;margin-left:.5rem}
+.risk-low{background:rgba(63,185,80,.1);color:var(--success-light);border:1px solid rgba(63,185,80,.25)}
+.risk-medium{background:rgba(210,153,34,.1);color:var(--warning-light);border:1px solid rgba(210,153,34,.25)}
+.risk-high{background:rgba(249,115,22,.1);color:var(--orange-light);border:1px solid rgba(249,115,22,.25)}
+.risk-critical{background:rgba(248,81,73,.1);color:var(--danger-light);border:1px solid rgba(248,81,73,.25)}
+.risk-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.75rem;display:none}
+.risk-panel.visible{display:block;animation:fadeSlide .3s ease}
+.risk-panel h4{font-size:.85rem;font-weight:700;color:var(--text-secondary);margin-bottom:.65rem;display:flex;align-items:center;gap:.4rem}
+.risk-factors{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.5rem}
+.risk-factor{display:flex;align-items:center;gap:.5rem;padding:.4rem .65rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text-secondary)}
+.risk-factor .rf-icon{font-size:.85rem;flex-shrink:0}
+.risk-factor .rf-label{flex:1}
+.risk-factor .rf-val{font-weight:700}
+
+/* Backup matrix */
+.backup-matrix{margin-top:.5rem}
+.backup-matrix table{width:100%;border-collapse:collapse;font-size:.7rem}
+.backup-matrix th{text-align:left;padding:.35rem .5rem;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);font-weight:700;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px}
+.backup-matrix td{padding:.35rem .5rem;border:1px solid var(--border);color:var(--text-secondary);vertical-align:top}
+.backup-matrix tr:hover td{background:rgba(88,166,255,.02)}
+
+/* Communication templates */
+.comm-templates{margin-top:.5rem}
+.comm-template{padding:.65rem .9rem;border-radius:8px;background:var(--bg-secondary);border:1px solid var(--border);margin-bottom:.5rem;font-size:.72rem;position:relative}
+.comm-template h5{font-size:.75rem;font-weight:700;color:var(--text-primary);margin-bottom:.35rem;display:flex;align-items:center;gap:.35rem}
+.comm-template pre{white-space:pre-wrap;font-family:'Inter',system-ui,sans-serif;color:var(--text-secondary);line-height:1.5;margin:0}
+.comm-copy{position:absolute;top:.5rem;right:.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:5px;padding:.2rem .5rem;font-size:.62rem;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .15s}
+.comm-copy:hover{color:var(--accent-light);border-color:rgba(88,166,255,.3)}
+
+/* EOL Timeline */
+.eol-timeline{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.75rem;display:none}
+.eol-timeline.visible{display:block;animation:fadeSlide .3s ease}
+.eol-timeline h4{font-size:.85rem;font-weight:700;color:var(--text-secondary);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+.eol-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.eol-label{width:90px;font-size:.7rem;font-weight:600;color:var(--text-secondary);text-align:right;flex-shrink:0}
+.eol-track{flex:1;height:22px;background:var(--bg-secondary);border-radius:4px;position:relative;overflow:hidden}
+.eol-fill{position:absolute;top:3px;bottom:3px;border-radius:3px;display:flex;align-items:center;padding:0 .4rem;font-size:.58rem;font-weight:700;color:#fff;white-space:nowrap}
+.eol-fill.eol-active{background:var(--success)}
+.eol-fill.eol-expired{background:var(--danger);opacity:.7}
+.eol-fill.eol-warning{background:var(--warning)}
+
+/* Cross-product sequence */
+.upgrade-sequence{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.15rem 1.35rem;margin-bottom:1.75rem;display:none}
+.upgrade-sequence.visible{display:block;animation:fadeSlide .3s ease}
+.upgrade-sequence h4{font-size:.82rem;font-weight:700;color:var(--accent-light);margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+.seq-steps{display:flex;flex-direction:column;gap:.4rem}
+.seq-step{display:flex;align-items:center;gap:.6rem;padding:.45rem .75rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;font-size:.75rem;transition:border-color .15s}
+.seq-step:hover{border-color:rgba(88,166,255,.2)}
+.seq-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;background:rgba(88,166,255,.08);color:var(--accent-light);border:1px solid rgba(88,166,255,.2);flex-shrink:0}
+.seq-prod{font-weight:700;color:var(--text-primary);min-width:80px}
+.seq-detail{color:var(--text-secondary);flex:1}
+.seq-time{font-size:.68rem;color:var(--text-muted);font-weight:600}
 
 /* HCL reminder */
 .hcl-reminder{padding:.55rem .9rem;border-radius:8px;background:rgba(88,166,255,.04);border:1px solid rgba(88,166,255,.15);font-size:.75rem;color:var(--accent-light);margin-top:.4rem;line-height:1.6}
@@ -346,6 +404,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
             <div class="hero-stat"><div class="num">88+</div><div class="lbl">Versions</div></div>
             <div class="hero-stat"><div class="num">120+</div><div class="lbl">Paths</div></div>
             <div class="hero-stat"><div class="num">7</div><div class="lbl">Interop Rules</div></div>
+            <div class="hero-stat"><div class="num">5</div><div class="lbl">Risk Factors</div></div>
         </div>
     </div>
 
@@ -380,6 +439,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-primary);color
     </div>
 
     <div class="interop-panel" id="interopPanel"></div>
+    <div class="risk-panel" id="riskPanel"></div>
+    <div class="upgrade-sequence" id="upgradeSequence"></div>
+    <div class="eol-timeline" id="eolTimeline"></div>
     <div class="maint-calc" id="maintCalc">
         <h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Maintenance Window Calculator</h4>
         <div class="maint-calc-grid">
@@ -480,15 +542,249 @@ var DEP_REASONS={
 
 // ---- Rollback guidance ----
 var ROLLBACK={
-    vcenter:'<strong>Rollback:</strong> Restore vCenter from file-based backup or VM snapshot taken before upgrade. VCSA snapshots must be taken at the appliance level.',
-    nsx:'<strong>Rollback:</strong> NSX Manager can be restored from backup. Edge nodes can be redeployed. Host transport nodes revert by removing VIBs.',
-    esxi:'<strong>Rollback:</strong> ESXi can be rolled back via <code>altbootbank</code> (reboot and select previous build). Ensure you have a host profile backup.',
-    vsan:'<strong>Rollback:</strong> vSAN ODF upgrades are ONE-WAY and CANNOT be rolled back. Ensure cluster health is green before proceeding.',
-    vcf:'<strong>Rollback:</strong> SDDC Manager upgrade can be restored from its internal backup. VCF component rollbacks follow individual product procedures.'
+    vcenter:{
+        summary:'Restore vCenter from file-based backup or VM snapshot taken before upgrade.',
+        steps:[
+            'Option A — VM Snapshot Revert: Power off VCSA VM → Revert to pre-upgrade snapshot → Power on → Verify services: service-control --status --all',
+            'Option B — File-Based Restore: Deploy fresh VCSA from OLD version ISO → Stage 1 only → Restore backup via VAMI (https://vcsa:5480 > Backup > Restore)',
+            'Option C — If using vCenter HA: Failover to passive node (if pre-upgrade passive still exists)',
+            'Post-Rollback: Verify all hosts reconnect, DRS/HA operational, Distributed Switches intact, SSO authentication works',
+            'IMPORTANT: If vCenter was upgraded as part of VCF, rollback must go through SDDC Manager procedures'
+        ],
+        rto:'30-60 min (snapshot), 90-120 min (file restore)'
+    },
+    nsx:{
+        summary:'NSX Manager can be restored from backup. Edge and host transport node rollback depends on component.',
+        steps:[
+            'NSX Manager: Restore from backup (System > Backup & Restore) to a fresh NSX Manager appliance deployment at the OLD version',
+            'Edge Nodes: Redeploy Edge VMs from NSX Manager at the restored version OR revert Edge VM snapshots if taken',
+            'Host Transport Nodes: Remove NSX VIBs from hosts (esxcli software vib remove -n nsx*) then re-prepare hosts from restored Manager',
+            'Federation: If Global Manager was upgraded, restore GM first, then restore each Local Manager',
+            'Post-Rollback: Verify DFW rules enforced, BGP/OSPF peering re-established, tunnels active between hosts'
+        ],
+        rto:'60-120 min (Manager restore), +30 min per Edge, +15 min per host cluster'
+    },
+    esxi:{
+        summary:'ESXi can be rolled back via alternate boot bank (immediate) or full reinstall with config restore.',
+        steps:[
+            'Option A — Alt Boot Bank (fastest): Reboot host → At boot menu select "Shift+R" to recover previous boot bank → Host reverts to prior ESXi build',
+            'Option B — CLI rollback: SSH to host → /altbootbank is the previous version → Run: /sbin/autobackup.sh then reboot to altbootbank',
+            'Option C — Full Reinstall: Boot from OLD version ISO → Fresh install → Restore config: vim-cmd hostsvc/firmware/restore_config /tmp/backup.tgz',
+            'Post-Rollback: Exit maintenance mode → Verify host reconnects to vCenter → Check VM access and network connectivity',
+            'IMPORTANT: If vLCM was used, the old image may need to be re-applied via Lifecycle Manager remediation'
+        ],
+        rto:'15-25 min (alt boot bank), 30-45 min (reinstall+restore)'
+    },
+    vsan:{
+        summary:'vSAN ODF upgrades are ONE-WAY and CANNOT be rolled back. ESXi host rollback is possible but ODF persists.',
+        steps:[
+            'WARNING: On-Disk Format (ODF) upgrade is IRREVERSIBLE — there is NO rollback procedure for ODF version',
+            'Host-Level Only: Individual ESXi hosts can be rolled back via alt boot bank, but vSAN disk groups retain new ODF',
+            'Disaster Recovery: If vSAN cluster becomes non-functional, only option is full cluster rebuild from backup',
+            'Mitigation: Before ODF upgrade, ensure file-level backup of ALL VMs on vSAN datastore exists externally',
+            'Best Practice: Upgrade all ESXi hosts first, validate cluster health fully, THEN trigger ODF upgrade as final step'
+        ],
+        rto:'N/A (ODF irreversible). Host rollback: 15-25 min per host'
+    },
+    vcf:{
+        summary:'SDDC Manager upgrade can be restored from backup. Individual component rollbacks follow product-specific procedures.',
+        steps:[
+            'SDDC Manager: Revert VM snapshot OR restore from SFTP backup to fresh appliance deployment at OLD version',
+            'Management vCenter: Follow vCenter rollback procedure (snapshot revert preferred)',
+            'NSX in VCF: Follow NSX rollback procedure — SDDC Manager will detect version mismatch and may need inventory refresh',
+            'ESXi Hosts: Follow ESXi alt boot bank procedure — SDDC Manager re-discovers host version after rollback',
+            'Post-Rollback: Run SDDC Manager validation (Administration > Inventory > Validate All) to resync inventory state',
+            'CRITICAL: Partial rollbacks (some components rolled back, others not) may leave VCF in inconsistent state — engage VMware GSS'
+        ],
+        rto:'2-4 hours (full environment rollback)'
+    }
+};
+
+// ---- Backup Verification Matrix ----
+var BACKUP_MATRIX={
+    vcenter:{
+        methods:[
+            {type:'File-Based Backup (VAMI)',tool:'Built-in VAMI scheduler',target:'SFTP/NFS/HTTP server',frequency:'Daily',retention:'7 days minimum',rto:'90-120 min',notes:'Captures DB, config, certs, and inventory. Preferred for disaster recovery.'},
+            {type:'VM Snapshot',tool:'vCenter/ESXi snapshot manager',target:'Same datastore',frequency:'Before every upgrade',retention:'Delete within 24-72h of success',rto:'5-15 min (instant revert)',notes:'Fast rollback but consumes datastore space. Memory snapshot optional for running state.'},
+            {type:'Image-Level Backup (Veeam/Commvault)',tool:'Enterprise backup solution',target:'Backup repository',frequency:'Daily',retention:'30 days',rto:'30-60 min',notes:'Full VM image backup. Can restore to dissimilar storage. Verify application consistency.'}
+        ]
+    },
+    esxi:{
+        methods:[
+            {type:'Host Config Backup',tool:'vim-cmd hostsvc/firmware/backup_config',target:'Download URL (save externally)',frequency:'Before every upgrade',retention:'Keep until next successful upgrade',rto:'10-15 min (with fresh install)',notes:'Captures: network config, storage config, VIBs list, host profile settings.'},
+            {type:'Alt Boot Bank',tool:'Built-in dual boot bank',target:'Local boot device',frequency:'Automatic (preserved on upgrade)',retention:'Always available (previous version)',rto:'5-10 min (reboot only)',notes:'Fastest rollback. No external tools needed. Simply reboot and select previous bank.'},
+            {type:'Host Profile',tool:'vCenter Host Profiles',target:'vCenter database',frequency:'After each config change',retention:'Until profile is updated',rto:'15-20 min (reapply to fresh install)',notes:'Captures full host configuration as a policy. Can be applied to fresh ESXi installs.'}
+        ]
+    },
+    vsan:{
+        methods:[
+            {type:'VM-Level Backup',tool:'Veeam/Commvault/VADP-based',target:'External backup repo (non-vSAN)',frequency:'Daily for critical VMs',retention:'30 days',rto:'Varies by VM size',notes:'CRITICAL: Backup must target NON-vSAN storage. ODF is irreversible — only VM data can be recovered.'},
+            {type:'vSAN Health Snapshots',tool:'vCenter vSAN health service',target:'vCenter database',frequency:'Continuous monitoring',retention:'30 days of history',rto:'N/A (monitoring only)',notes:'Not a backup tool — provides health baseline for comparison. Export health reports before upgrade.'},
+            {type:'Storage Policy Documentation',tool:'PowerCLI Get-SpbmStoragePolicy',target:'CSV/JSON export file',frequency:'Before upgrade',retention:'Keep indefinitely',rto:'5 min (reapply policies)',notes:'Document all VM storage policy assignments. Can be re-applied after cluster rebuild if needed.'}
+        ]
+    },
+    nsx:{
+        methods:[
+            {type:'NSX Manager Backup',tool:'Built-in (System > Backup & Restore)',target:'Remote SFTP server',frequency:'Daily + before upgrade',retention:'7 days',rto:'60-90 min (fresh deploy + restore)',notes:'Captures: all policies, DFW rules, segments, gateways, Edge config. Does NOT backup Edge data plane state.'},
+            {type:'NSX Manager VM Snapshot',tool:'vCenter snapshot',target:'Same datastore',frequency:'Before every upgrade step',retention:'Delete within 72h',rto:'10-15 min',notes:'Quick rollback point. Take snapshot of ALL 3 Manager nodes simultaneously for consistency.'},
+            {type:'DFW/Policy API Export',tool:'NSX REST API (GET /policy/api/v1/infra)',target:'JSON file (external)',frequency:'Before upgrade',retention:'Keep indefinitely',rto:'15-30 min (manual reimport)',notes:'Full policy tree export as JSON. Can be reimported via API PUT. Useful as audit trail.'}
+        ]
+    },
+    vcf:{
+        methods:[
+            {type:'SDDC Manager Backup',tool:'Built-in (Administration > Backup)',target:'Remote SFTP server',frequency:'Daily + before upgrade',retention:'7 days',rto:'60-90 min',notes:'Captures: SDDC Manager DB, inventory, workflows, credential vault. Essential for full VCF recovery.'},
+            {type:'All Management VM Snapshots',tool:'vCenter snapshot (coordinate)',target:'Management datastore',frequency:'Before each VCF upgrade step',retention:'Delete within 72h of success',rto:'30-60 min (revert all)',notes:'Snapshot: SDDC Manager + vCenter + NSX Managers + Edges simultaneously. Coordinate timing for consistency.'},
+            {type:'VCF Configuration Export',tool:'SDDC Manager API (GET /v1/system)',target:'JSON files (external)',frequency:'Before upgrade',retention:'Keep indefinitely',rto:'N/A (reference only)',notes:'Document full VCF configuration: domains, clusters, hosts, networks. Reference for rebuilding if needed.'}
+        ]
+    }
 };
 
 // ---- HCL URL ----
 var HCL_URL='https://www.vmware.com/resources/compatibility/search.php';
+
+// ---- Risk Assessment Calculator ----
+function calculateRisk(stepPlans){
+    var score=0;
+    var factors=[];
+
+    stepPlans.forEach(function(plan){
+        if(plan.error){score+=20;factors.push({icon:'&#128683;',label:'No path found ('+PRODUCT_LABELS[plan.key]+')',val:'+20'});return;}
+        var prod=PRODUCT_MAP[plan.key];
+        var hops=plan.path.length-1;
+
+        // Version jump distance
+        if(hops>=3){score+=15;factors.push({icon:'&#128200;',label:PRODUCT_LABELS[plan.key]+': '+hops+' hops (long jump)',val:'+15'});}
+        else if(hops===2){score+=8;factors.push({icon:'&#128200;',label:PRODUCT_LABELS[plan.key]+': '+hops+' hops',val:'+8'});}
+        else {score+=3;}
+
+        // EOL source version
+        if(isEOL(prod,plan.from)){score+=10;factors.push({icon:'&#9888;',label:PRODUCT_LABELS[plan.key]+': Source is EOL',val:'+10'});}
+
+        // EOL target version
+        if(isEOL(prod,plan.to)){score+=15;factors.push({icon:'&#128308;',label:PRODUCT_LABELS[plan.key]+': Target is EOL!',val:'+15'});}
+
+        // Irreversible ODF
+        if(plan.key==='vsan'){score+=12;factors.push({icon:'&#128274;',label:'vSAN ODF upgrade (irreversible)',val:'+12'});}
+
+        // Major version jump (different major number)
+        var fromMajor=plan.from.split('.')[0];
+        var toMajor=plan.to.split('.')[0];
+        if(fromMajor!==toMajor){score+=10;factors.push({icon:'&#9889;',label:PRODUCT_LABELS[plan.key]+': Major version change ('+fromMajor+'.x → '+toMajor+'.x)',val:'+10'});}
+
+        // VCF complexity
+        if(plan.key==='vcf'){score+=10;factors.push({icon:'&#9729;',label:'VCF full-stack orchestration complexity',val:'+10'});}
+    });
+
+    // Multi-product complexity
+    var productCount=stepPlans.filter(function(s){return !s.error;}).length;
+    if(productCount>=4){score+=15;factors.push({icon:'&#127760;',label:productCount+' products upgrading simultaneously',val:'+15'});}
+    else if(productCount>=3){score+=8;factors.push({icon:'&#127760;',label:productCount+' products upgrading together',val:'+8'});}
+
+    var level,cls;
+    if(score<=15){level='Low';cls='risk-low';}
+    else if(score<=35){level='Medium';cls='risk-medium';}
+    else if(score<=55){level='High';cls='risk-high';}
+    else{level='Critical';cls='risk-critical';}
+
+    return {score:score,level:level,cls:cls,factors:factors};
+}
+
+// ---- Communication Templates Generator ----
+function generateCommTemplates(stepPlans,selections){
+    var products=stepPlans.filter(function(s){return !s.error;}).map(function(s){
+        var prod=PRODUCT_MAP[s.key];
+        return getLabel(prod,s.from)+' → '+getLabel(prod,s.to);
+    });
+    var productList=products.join(', ');
+    var date=new Date();
+    var planDate=date.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+    var pre='Subject: [Change Notification] VMware Infrastructure Upgrade — '+planDate+'\n\n'+
+        'Dear Team,\n\n'+
+        'This notification confirms a planned VMware infrastructure upgrade scheduled for [DATE/TIME].\n\n'+
+        'SCOPE:\n'+products.map(function(p){return '  • '+p;}).join('\n')+'\n\n'+
+        'EXPECTED IMPACT:\n'+
+        '  • Management plane: Brief interruption during vCenter upgrade (30-60 min)\n'+
+        '  • VM workloads: No downtime expected (rolling upgrade with DRS evacuation)\n'+
+        '  • Network: Momentary Edge failover for NSX-dependent traffic (2-5 sec)\n\n'+
+        'ROLLBACK PLAN:\n'+
+        '  • VM snapshots taken before each step\n'+
+        '  • File-based backups verified and accessible\n'+
+        '  • Rollback decision point: 30 min after each component upgrade\n\n'+
+        'CONTACTS:\n'+
+        '  • Primary Engineer: [Name] — [Phone/Email]\n'+
+        '  • Escalation: [Name] — [Phone/Email]\n'+
+        '  • VMware GSS Case: [SR Number if opened proactively]\n\n'+
+        'Please acknowledge receipt of this notification.\n\nRegards,\n[Your Name]';
+
+    var during='Subject: [IN PROGRESS] VMware Upgrade — Status Update\n\n'+
+        'Team,\n\n'+
+        'Upgrade is currently IN PROGRESS. Status as of [TIME]:\n\n'+
+        '  ✅ Completed: [component]\n'+
+        '  🔄 In Progress: [component] — estimated [X] min remaining\n'+
+        '  ⏳ Pending: [remaining components]\n\n'+
+        'Current health: All systems nominal / [describe any issues]\n'+
+        'Next update: In [30/60] minutes or upon completion.\n\n'+
+        'Regards,\n[Your Name]';
+
+    var post='Subject: [COMPLETED] VMware Upgrade — Successful\n\n'+
+        'Team,\n\n'+
+        'The VMware infrastructure upgrade has been COMPLETED SUCCESSFULLY.\n\n'+
+        'SUMMARY:\n'+products.map(function(p){return '  ✅ '+p;}).join('\n')+'\n\n'+
+        'VALIDATION:\n'+
+        '  • All services operational and healthy\n'+
+        '  • Post-upgrade checks passed\n'+
+        '  • VM workloads running normally\n'+
+        '  • Backup jobs verified functional\n\n'+
+        'NEXT STEPS:\n'+
+        '  • Pre-upgrade snapshots will be removed in 48-72 hours\n'+
+        '  • Monitor environment for 24 hours for any latent issues\n'+
+        '  • Report any anomalies to [contact]\n\n'+
+        'Total upgrade duration: [X hours Y minutes]\n'+
+        'Downtime experienced: [None / X minutes for component Y]\n\n'+
+        'Regards,\n[Your Name]';
+
+    return [{title:'Pre-Upgrade Notification',icon:'&#128227;',content:pre},{title:'During Upgrade Status',icon:'&#128260;',content:during},{title:'Post-Upgrade Completion',icon:'&#9989;',content:post}];
+}
+
+// ---- EOL Timeline Builder ----
+function buildEolTimeline(stepPlans){
+    var now=new Date();
+    var nowYear=now.getFullYear();
+    var nowMonth=now.getMonth()+1;
+    // General Support end estimates (approximate based on VMware lifecycle policy: 5 years from GA)
+    var bars=[];
+    stepPlans.forEach(function(plan){
+        if(plan.error) return;
+        var prod=PRODUCT_MAP[plan.key];
+        // Show from and to version lifecycle status
+        [plan.from,plan.to].forEach(function(vid){
+            var ver=prod.versions.find(function(v){return v.id===vid;});
+            if(!ver) return;
+            var relParts=ver.release?ver.release.split('-'):[nowYear.toString(),(nowMonth<10?'0':'')+nowMonth];
+            var relYear=parseInt(relParts[0]);
+            var relMonth=parseInt(relParts[1]);
+            // Approximate end of general support: +5 years for major releases
+            var eolYear=relYear+5;
+            var eolMonth=relMonth;
+            var status='active';
+            if(ver.eol) status='expired';
+            else if(eolYear<=nowYear&&eolMonth<=nowMonth) status='expired';
+            else if(eolYear===nowYear+1||(eolYear===nowYear&&eolMonth-nowMonth<=6)) status='warning';
+
+            bars.push({
+                product:PRODUCT_LABELS[plan.key],
+                version:ver.label,
+                release:ver.release||'Unknown',
+                eolApprox:eolYear+'-'+(eolMonth<10?'0':'')+eolMonth,
+                status:status,
+                color:COLORS[plan.key],
+                isTarget:vid===plan.to
+            });
+        });
+    });
+    return bars;
+}
 
 // ---- Maintenance Window Calculator ----
 window.recalcMaint=function(){
@@ -948,7 +1244,66 @@ window.generatePlan=function(){
     }
 
     var totalHops=stepPlans.reduce(function(a,s){return a+(s.path?s.path.length-1:0);},0);
-    html+='<div class="results-header"><h3>&#128203; Upgrade Plan</h3><div class="badge-row">'+
+
+    // Risk Assessment
+    var risk=calculateRisk(stepPlans);
+    var riskDiv=document.getElementById('riskPanel');
+    var riskHtml='<h4>&#128202; Risk Assessment <span class="risk-badge '+risk.cls+'">'+risk.level+' (Score: '+risk.score+')</span></h4>';
+    riskHtml+='<div class="risk-factors">';
+    risk.factors.forEach(function(f){
+        riskHtml+='<div class="risk-factor"><span class="rf-icon">'+f.icon+'</span><span class="rf-label">'+f.label+'</span><span class="rf-val">'+f.val+'</span></div>';
+    });
+    if(risk.factors.length===0) riskHtml+='<div class="risk-factor"><span class="rf-icon">&#9989;</span><span class="rf-label">No elevated risk factors detected</span><span class="rf-val">Low</span></div>';
+    riskHtml+='</div>';
+    riskDiv.innerHTML=riskHtml;
+    riskDiv.classList.add('visible');
+
+    // Cross-Product Upgrade Sequence (detailed)
+    var seqDiv=document.getElementById('upgradeSequence');
+    if(active.length>1){
+        var seqHtml='<h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg> Detailed Upgrade Sequence</h4><div class="seq-steps">';
+        var seqNum=0;
+        var timeMap2={vcenter:45,nsx:75,esxi:25,vsan:10,vcf:180};
+        active.forEach(function(key){
+            seqNum++;
+            var plan=stepPlans.find(function(s){return s.key===key;});
+            if(!plan||plan.error) return;
+            var prod=PRODUCT_MAP[key];
+            var hops=plan.path.length-1;
+            var estTime=(timeMap2[key]||30)*hops;
+            var reason=DEP_REASONS[key];
+            seqHtml+='<div class="seq-step"><span class="seq-num" style="background:'+COLORS[key]+'15;color:'+COLORS[key]+';border-color:'+COLORS[key]+'40">'+seqNum+'</span>';
+            seqHtml+='<span class="seq-prod" style="color:'+COLORS[key]+'">'+PRODUCT_LABELS[key]+'</span>';
+            seqHtml+='<span class="seq-detail">'+getLabel(prod,plan.from)+' → '+getLabel(prod,plan.to)+' ('+hops+' hop'+(hops>1?'s':'')+') — '+reason+'</span>';
+            seqHtml+='<span class="seq-time">~'+estTime+' min</span></div>';
+        });
+        seqHtml+='</div>';
+        seqDiv.innerHTML=seqHtml;
+        seqDiv.classList.add('visible');
+    } else {
+        seqDiv.classList.remove('visible');
+    }
+
+    // EOL Timeline
+    var eolDiv=document.getElementById('eolTimeline');
+    var eolBars=buildEolTimeline(stepPlans);
+    if(eolBars.length>0){
+        var eolHtml='<h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Version Lifecycle Status</h4>';
+        eolBars.forEach(function(bar){
+            var statusCls=bar.status==='expired'?'eol-expired':(bar.status==='warning'?'eol-warning':'eol-active');
+            var statusLabel=bar.status==='expired'?'EOL':(bar.status==='warning'?'Expiring Soon':'Supported');
+            eolHtml+='<div class="eol-bar">';
+            eolHtml+='<div class="eol-label" style="color:'+bar.color+'">'+bar.version+(bar.isTarget?' ★':'')+'</div>';
+            eolHtml+='<div class="eol-track"><div class="eol-fill '+statusCls+'" style="left:0;width:100%;">'+statusLabel+' — Released '+bar.release+(bar.status!=='expired'?' — Support est. until ~'+bar.eolApprox:'')+'</div></div>';
+            eolHtml+='</div>';
+        });
+        eolDiv.innerHTML=eolHtml;
+        eolDiv.classList.add('visible');
+    } else {
+        eolDiv.classList.remove('visible');
+    }
+
+    html+='<div class="results-header"><h3>&#128203; Upgrade Plan <span class="risk-badge '+risk.cls+'">Risk: '+risk.level+'</span></h3><div class="badge-row">'+
         '<span class="badge badge-accent">'+totalSteps+' Product'+(totalSteps>1?'s':'')+'</span>'+
         '<span class="badge badge-warning">'+totalHops+' Version Hop'+(totalHops>1?'s':'')+'</span>'+
         '<span class="badge badge-success">'+(warnings.length===0?'No Warnings':warnings.length+' Warning'+(warnings.length>1?'s':''))+'</span>'+
@@ -1031,7 +1386,29 @@ window.generatePlan=function(){
         if(ki) html+='<div class="known-issue">&#9888;&#65039; <strong>Known Issue:</strong> '+ki+'</div>';
 
         // Rollback guidance
-        if(ROLLBACK[plan.key]) html+='<div class="rollback-box">&#128260; '+ROLLBACK[plan.key]+'</div>';
+        if(ROLLBACK[plan.key]){
+            var rb=ROLLBACK[plan.key];
+            var rbid='rb-'+plan.key;
+            html+='<button class="detail-toggle" onclick="toggleDetail(\''+rbid+'\',this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>Rollback Procedure ('+rb.steps.length+' steps)</button>';
+            html+='<div class="detail-content" id="'+rbid+'"><div class="rollback-box">&#128260; <strong>Rollback:</strong> '+rb.summary;
+            html+='<ul class="rollback-steps">';
+            rb.steps.forEach(function(s){html+='<li>'+s+'</li>';});
+            html+='</ul>';
+            html+='<div class="rollback-rto">&#9201; Recovery Time Objective: '+rb.rto+'</div>';
+            html+='</div></div>';
+        }
+
+        // Backup verification matrix
+        if(BACKUP_MATRIX[plan.key]){
+            var bm=BACKUP_MATRIX[plan.key];
+            var bmid='bm-'+plan.key;
+            html+='<button class="detail-toggle" onclick="toggleDetail(\''+bmid+'\',this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>Backup Matrix ('+bm.methods.length+' methods)</button>';
+            html+='<div class="detail-content" id="'+bmid+'"><div class="backup-matrix"><table><tr><th>Method</th><th>Tool</th><th>Target</th><th>Frequency</th><th>RTO</th></tr>';
+            bm.methods.forEach(function(m){
+                html+='<tr><td><strong>'+m.type+'</strong></td><td>'+m.tool+'</td><td>'+m.target+'</td><td>'+m.frequency+'</td><td>'+m.rto+'</td></tr>';
+            });
+            html+='</table></div></div>';
+        }
 
         // HCL reminder for ESXi
         if(plan.key==='esxi') html+='<div class="hcl-reminder">&#128187; <strong>HCL Check:</strong> Verify server model + ESXi '+getLabel(prod,plan.to)+' on the <a href="'+HCL_URL+'" target="_blank" rel="noopener">VMware HCL</a> before upgrading. Check IO devices, storage controllers, and NICs.</div>';
@@ -1039,9 +1416,23 @@ window.generatePlan=function(){
         html+='</div></div>';
     });
 
+    // Communication Templates
+    var commTemplates=generateCommTemplates(stepPlans,selections);
+    var commId='comm-templates';
+    html+='<div class="step-card" style="border-left:3px solid var(--accent)"><h4>&#128231; Communication Templates</h4>';
+    html+='<div class="step-subtitle">Pre-written email templates for stakeholder communication during the upgrade window</div>';
+    html+='<div class="step-details">';
+    html+='<button class="detail-toggle" onclick="toggleDetail(\''+commId+'\',this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>Email Templates (3)</button>';
+    html+='<div class="detail-content" id="'+commId+'"><div class="comm-templates">';
+    commTemplates.forEach(function(tpl,idx){
+        html+='<div class="comm-template"><h5>'+tpl.icon+' '+tpl.title+'</h5><button class="comm-copy" onclick="copyTemplate('+idx+')">Copy</button><pre>'+escapeHTML(tpl.content)+'</pre></div>';
+    });
+    html+='</div></div></div></div>';
+
     resultsDiv.innerHTML=html;
     resultsDiv.classList.add('visible');
     lastPlan=stepPlans;
+    window._commTemplates=commTemplates;
 
     // Timeline
     buildTimeline(stepPlans);
@@ -1115,6 +1506,19 @@ window.toggleDetail=function(id,btn){
     btn.classList.toggle('open');
 };
 
+window.copyTemplate=function(idx){
+    if(!window._commTemplates||!window._commTemplates[idx]) return;
+    var text=window._commTemplates[idx].content;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){showToast('Template copied to clipboard!');});
+    } else {
+        var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';
+        document.body.appendChild(ta);ta.select();
+        try{document.execCommand('copy');showToast('Template copied!');}catch(e){}
+        document.body.removeChild(ta);
+    }
+};
+
 window.toggleAllDetails=function(btn){
     var contents=document.querySelectorAll('.detail-content');
     var toggles=document.querySelectorAll('.detail-toggle');
@@ -1146,6 +1550,12 @@ window.resetAll=function(){
     document.getElementById('results').classList.remove('visible');
     document.getElementById('interopPanel').innerHTML='';
     document.getElementById('interopPanel').classList.remove('visible');
+    document.getElementById('riskPanel').innerHTML='';
+    document.getElementById('riskPanel').classList.remove('visible');
+    document.getElementById('upgradeSequence').innerHTML='';
+    document.getElementById('upgradeSequence').classList.remove('visible');
+    document.getElementById('eolTimeline').innerHTML='';
+    document.getElementById('eolTimeline').classList.remove('visible');
     document.getElementById('timelineSection').classList.remove('visible');
     document.getElementById('btnExport').style.display='none';
     document.getElementById('btnCopyLink').style.display='none';
@@ -1159,6 +1569,9 @@ window.resetAll=function(){
 
 window.exportPDF=function(){
     var interop=document.getElementById('interopPanel').innerHTML;
+    var riskPanel=document.getElementById('riskPanel').innerHTML;
+    var upgradeSeq=document.getElementById('upgradeSequence').innerHTML;
+    var eolTl=document.getElementById('eolTimeline').innerHTML;
     var results=document.getElementById('results').innerHTML;
     var timeline=document.getElementById('timelineSection').innerHTML;
     var maintCalc=document.getElementById('maintCalc');
@@ -1169,8 +1582,8 @@ window.exportPDF=function(){
     win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Upgrade Plan Export</title>');
     win.document.write('<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">');
     win.document.write('<style>'+styles+'body{background:#fff!important;color:#111!important;padding:2rem;font-family:Inter,system-ui,sans-serif;line-height:1.7}');
-    win.document.write('.step-card,.stack-order,.interop-item,.timeline-bar-container{border-color:#ddd!important;background:#fafafa!important}');
-    win.document.write('.step-card::before,.badge,.order-chip,.path-node,.timeline-fill,.interop-item{print-color-adjust:exact;-webkit-print-color-adjust:exact}');
+    win.document.write('.step-card,.stack-order,.interop-item,.timeline-bar-container,.risk-panel,.upgrade-sequence,.eol-timeline{border-color:#ddd!important;background:#fafafa!important}');
+    win.document.write('.step-card::before,.badge,.order-chip,.path-node,.timeline-fill,.interop-item,.risk-badge,.seq-num,.eol-fill{print-color-adjust:exact;-webkit-print-color-adjust:exact}');
     win.document.write('.path-node{background:#f0f1f3!important;border-color:#d0d5db!important;color:#1f2937!important}');
     win.document.write('.path-node.current{background:#fef2f2!important;border-color:#ef4444!important;color:#dc2626!important}');
     win.document.write('.path-node.target{background:#f0fdf4!important;border-color:#22c55e!important;color:#16a34a!important}');
@@ -1183,11 +1596,19 @@ window.exportPDF=function(){
     win.document.write('.badge{color:#fff!important}');
     win.document.write('.rollback-box{background:#fffbeb!important;border-color:#f59e0b!important;color:#92400e!important}');
     win.document.write('.hcl-reminder{background:#eff6ff!important;border-color:#3b82f6!important;color:#1e40af!important}');
+    win.document.write('.risk-panel{display:block!important;background:#fafafa!important}.risk-factor{background:#fff!important}');
+    win.document.write('.upgrade-sequence{display:block!important;background:#fafafa!important}.seq-step{background:#fff!important}');
+    win.document.write('.eol-timeline{display:block!important;background:#fafafa!important}');
+    win.document.write('.backup-matrix td,.backup-matrix th{border-color:#ddd!important}');
+    win.document.write('.comm-template{background:#fff!important;border-color:#ddd!important}.comm-copy{display:none!important}');
     win.document.write('.export-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #ddd}');
     win.document.write('.export-header h1{font-size:1.3rem;font-weight:700;color:#111}.export-header p{font-size:.75rem;color:#666;margin-top:.25rem}');
     win.document.write('@media print{@page{margin:1cm}}</style></head><body>');
     win.document.write('<div class="export-header"><h1>VMware Upgrade Plan</h1><p>Generated '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})+' \u2014 mustafamalqadi.github.io/vmware-upgrade-path</p></div>');
+    if(riskPanel) win.document.write('<div class="risk-panel visible">'+riskPanel+'</div>');
     if(interop) win.document.write('<div class="interop-panel visible">'+interop+'</div>');
+    if(upgradeSeq) win.document.write('<div class="upgrade-sequence visible">'+upgradeSeq+'</div>');
+    if(eolTl) win.document.write('<div class="eol-timeline visible">'+eolTl+'</div>');
     win.document.write('<div class="results visible">'+results+'</div>');
     if(maintHtml) win.document.write('<div style="margin:1rem 0;padding:.75rem 1rem;border:1px solid #ddd;border-radius:8px;background:#f0fdf4;font-size:.85rem;font-weight:600;color:#166534">'+maintHtml+'</div>');
     if(timeline) win.document.write('<div class="timeline-section visible">'+timeline+'</div>');
