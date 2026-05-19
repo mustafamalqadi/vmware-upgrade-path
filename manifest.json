@@ -1,0 +1,13 @@
+{
+  "name": "VMware Upgrade Path Planner",
+  "short_name": "Upgrade Planner",
+  "description": "Plan VMware product upgrade sequences with dependency tracking",
+  "start_url": "/vmware-upgrade-path/",
+  "display": "standalone",
+  "background_color": "#090d1a",
+  "theme_color": "#3b82f6",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
