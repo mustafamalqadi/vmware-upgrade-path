@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="VMware Upgrade Path Planner — calculate the correct upgrade sequence for vCenter, ESXi, vSAN, NSX, and VCF across your full stack. Pre-checks, interoperability warnings, and timeline.">
     <meta property="og:title" content="VMware Upgrade Path Planner — Full Stack Sequencer">
@@ -13,6 +15,7 @@
     <meta name="twitter:image" content="https://mustafamalqadi.github.io/vmware-upgrade-path/og-image.png">
     <meta name="theme-color" content="#0d1117">
     <link rel="manifest" href="manifest.json">
+    <link rel="canonical" href="https://mustafamalqadi.github.io/vmware-upgrade-path/">
     <title>VMware Upgrade Path Planner — Full Stack Sequencer</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 22L16 6l8 16' stroke='%2358a6ff' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11 16h10' stroke='%233fb950' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -516,6 +519,11 @@ button,select,input{font-family:inherit}
 .cmd-item svg{width:16px;height:16px;opacity:.6;flex-shrink:0}
 .cmd-item .cmd-label{flex:1}
 .cmd-item .cmd-hint{font-size:.7rem;color:var(--text-muted,#6b7a99)}
+.back-top{position:fixed;bottom:2rem;right:2rem;width:40px;height:40px;border-radius:50%;background:var(--bg-card,#111827);border:1px solid var(--border);color:var(--text-secondary,#94a3b8);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s;pointer-events:none}
+.back-top.visible{opacity:1;transform:none;pointer-events:auto}
+.back-top:hover{border-color:var(--accent);color:var(--accent)}
+.offline-bar{position:fixed;top:0;left:0;right:0;background:#f59e0b;color:#000;text-align:center;padding:.4rem;font-size:.75rem;font-weight:600;z-index:10000;transform:translateY(-100%);transition:transform .3s}
+.offline-bar.show{transform:none}
     </style>
 </head>
 <body>
@@ -2500,6 +2508,10 @@ if(pl){window.addEventListener('load',function(){setTimeout(function(){pl.classL
 <script>
 (function(){var items=[{label:'Portfolio',url:'https://mustafamalqadi.github.io/',hint:'Home'},{label:'Knowledge Bases',url:'https://mustafamalqadi.github.io/vmware-kbs/',hint:'KB Hub'},{label:'Training Courses',url:'https://mustafamalqadi.github.io/training-courses/',hint:'Courses'},{label:'Upgrade Planner',url:'#',hint:'Current page'},{label:'License Calculator',url:'https://mustafamalqadi.github.io/vcf-license-calculator/',hint:'VCF cost'}];var overlay=document.getElementById('cmdOverlay'),input=document.getElementById('cmdInput'),results=document.getElementById('cmdResults');var activeIdx=-1;function open(){overlay.classList.add('open');input.value='';render('');input.focus();activeIdx=-1;}function close(){overlay.classList.remove('open');}function render(q){var f=items.filter(function(i){return!q||i.label.toLowerCase().indexOf(q)!==-1;});results.innerHTML=f.map(function(i,idx){return'<div class="cmd-item'+(idx===activeIdx?' active':'')+' " data-url="'+i.url+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg><span class="cmd-label">'+i.label+'</span><span class="cmd-hint">'+i.hint+'</span></div>';}).join('');}input.addEventListener('input',function(){activeIdx=-1;render(this.value.toLowerCase().trim());});results.addEventListener('click',function(e){var el=e.target.closest('.cmd-item');if(el){close();window.location.href=el.dataset.url;}});overlay.addEventListener('click',function(e){if(e.target===overlay)close();});document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();overlay.classList.contains('open')?close():open();}if(e.key==='Escape'&&overlay.classList.contains('open'))close();if(overlay.classList.contains('open')&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();var els=results.querySelectorAll('.cmd-item');if(e.key==='ArrowDown')activeIdx=Math.min(activeIdx+1,els.length-1);else activeIdx=Math.max(activeIdx-1,0);els.forEach(function(el,i){el.classList.toggle('active',i===activeIdx);});}if(e.key==='Enter'&&overlay.classList.contains('open')){var a=results.querySelector('.cmd-item.active');if(a){close();window.location.href=a.dataset.url;}}});})();
 </script>
+<button class="back-top" id="backTop" title="Back to top">&#8593;</button>
+<script>(function(){var b=document.getElementById('backTop');window.addEventListener('scroll',function(){b.classList.toggle('visible',window.scrollY>300);},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});})();</script>
+<div class="offline-bar" id="offlineBar">You are offline — cached content is being shown</div>
+<script>(function(){var bar=document.getElementById('offlineBar');window.addEventListener('offline',function(){bar.classList.add('show');});window.addEventListener('online',function(){bar.classList.remove('show');});if(!navigator.onLine)bar.classList.add('show');})();</script>
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
 <script>if(document.startViewTransition){
   document.querySelectorAll('.site-strip a:not(.current)').forEach(function(a){
