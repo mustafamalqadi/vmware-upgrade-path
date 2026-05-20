@@ -561,7 +561,7 @@ button,select,input{font-family:inherit}
         <div class="header-right">
             <span class="header-badge">5 Products</span>
             <span class="header-badge" style="background:rgba(16,185,129,.08);color:var(--success-light);border-color:rgba(16,185,129,.2)">88+ Versions</span>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">&#127769;</button>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle theme">&#127769;</button>
             <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="document.getElementById('headerLinks').classList.toggle('open')" title="Menu">&#9776;</button>
             <div class="header-links" id="headerLinks">
                 <a href="https://mustafamalqadi.github.io/vmware-kbs/">KB Portal</a>
@@ -575,7 +575,7 @@ button,select,input{font-family:inherit}
 <main class="container" id="main-content">
 
     <div class="hero">
-        <h2>VMware Full Stack Upgrade Planner</h2>
+        <h1>VMware Full Stack Upgrade Planner</h1>
         <p>Select current and target versions for each product. The planner calculates the correct upgrade sequence, intermediate hops, interoperability checks, and a visual timeline.</p>
         <div class="hero-stats">
             <div class="hero-stat"><div class="num">5</div><div class="lbl">Products</div></div>
@@ -2505,8 +2505,8 @@ if(pl){window.addEventListener('load',function(){setTimeout(function(){pl.classL
 </script>
 <button class="back-top" id="backTop" title="Back to top">&#8593;</button>
 <script>(function(){var b=document.getElementById('backTop');window.addEventListener('scroll',function(){b.classList.toggle('visible',window.scrollY>300);},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});})();</script>
-<div class="offline-bar" id="offlineBar">You are offline — cached content is being shown</div>
-<script>(function(){var bar=document.getElementById('offlineBar');window.addEventListener('offline',function(){bar.classList.add('show');});window.addEventListener('online',function(){bar.classList.remove('show');});if(!navigator.onLine)bar.classList.add('show');})();</script>
+<div class="offline-bar" id="offlineBar" hidden>You are offline — cached content is being shown</div>
+<script>(function(){var bar=document.getElementById('offlineBar');function show(){bar.hidden=false;bar.classList.add('show');}function hide(){bar.classList.remove('show');bar.hidden=true;}window.addEventListener('offline',show);window.addEventListener('online',hide);if(!navigator.onLine)show();})();</script>
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
 <script>if(document.startViewTransition){
   document.querySelectorAll('.site-strip a:not(.current)').forEach(function(a){
